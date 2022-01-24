@@ -619,7 +619,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(new FlxText(player3DropDown.x, player3DropDown.y - 15, 0, 'Girlfriend:'));
 		tab_group_song.add(new FlxText(player1DropDown.x, player1DropDown.y - 15, 0, 'Boyfriend:'));
 		tab_group_song.add(new FlxText(stageDropDown.x, stageDropDown.y - 15, 0, 'Stage:'));
-		tab_group_song.add(new FlxText(noteSkinInputText.x, noteSkinInputText.y - 15, 0, 'Note Texture: (Supports both players)'));
+		tab_group_song.add(new FlxText(noteSkinInputText.x, noteSkinInputText.y - 15, 0, 'Note Texture: (e.g. someNOTE, NOTE_assets)'));
 		tab_group_song.add(new FlxText(noteSplashesInputText.x, noteSplashesInputText.y - 15, 0, 'Note Splashes Texture:'));
 		tab_group_song.add(new FlxText(extraTextInputText.x, extraTextInputText.y - 15, 0, 'Extra Text:'));
 		tab_group_song.add(player2DropDown);
@@ -2077,8 +2077,15 @@ class ChartingState extends MusicBeatState
 		var daNoteInfo = i[1];
 		var daStrumTime = i[0];
 		var daSus:Dynamic = i[2];
+		var thisSection = _song.notes[curSection];
 
-		var note:Note = new Note(daStrumTime, daNoteInfo % 4, null, null, true);
+		var gottaHitNote:Bool = thisSection.mustHitSection;
+
+		if (i[1] > 3)
+			{
+				gottaHitNote = !thisSection.mustHitSection;
+			}
+		var note:Note = new Note(daStrumTime, daNoteInfo % 4, null, null, true, gottaHitNote);
 		if(daNoteInfo > -1) { //Common note
 			if(!Std.isOfType(i[3], String)) //Convert old note type to new note type format
 			{

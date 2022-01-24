@@ -85,7 +85,7 @@ class Note extends FlxSprite
 		if(noteData > -1 && noteType != value) {
 			switch(value) {
 				case 'Hurt Note':
-					ignoreNote = mustPress;
+					ignoreNote = true;
 					reloadNote('HURT');
 					noteSplashTexture = 'HURTnoteSplashes';
 					colorSwap.hue = 0;
@@ -108,7 +108,7 @@ class Note extends FlxSprite
 		return value;
 	}
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?inEditor:Bool = false, ?isPlayer:Bool = false)
 	{
 		super();
 
@@ -118,6 +118,7 @@ class Note extends FlxSprite
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
 		this.inEditor = inEditor;
+		this.mustPress = isPlayer; //this would be useless anyway, but for noteskin purposes its there
 
 		x += (ClientPrefs.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
@@ -222,9 +223,15 @@ class Note extends FlxSprite
 		if(texture == null) texture = '';
 		if(suffix == null) suffix = '';
 		
+		var daSkin:Array<String> = ['NOTE_assets'];
+		daSkin = PlayState.SONG.arrowSkin.split(', ');
+		if(daSkin.length == 1) daSkin[1] = daSkin[0];
+		var subSkin:String = '';
+		if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1 && texture.length < 1) subSkin = daSkin[this.mustPress ? 1 : 0];
+
 		var skin:String = texture;
 		if(texture.length < 1) {
-			skin = PlayState.SONG.arrowSkin;
+			skin = subSkin;
 			if(skin == null || skin.length < 1) {
 				skin = 'NOTE_assets';
 			}

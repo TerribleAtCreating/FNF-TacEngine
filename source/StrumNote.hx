@@ -24,8 +24,7 @@ class StrumNote extends FlxSprite
 		super(x, y);
 
 		var skin:Array<String> = ['NOTE_assets'];
-		if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin.split(',');
-		trace(skin);
+		if(PlayState.SONG.arrowSkin != null && PlayState.SONG.arrowSkin.length > 1) skin = PlayState.SONG.arrowSkin.split(', ');
 		if(skin.length == 1) skin[1] = skin[0];
 
 		if(PlayState.isPixelStage)
