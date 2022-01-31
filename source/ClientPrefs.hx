@@ -61,6 +61,7 @@ class ClientPrefs {
 		'ui_down'		=> [S, DOWN],
 		'ui_up'			=> [W, UP],
 		'ui_right'		=> [D, RIGHT],
+		'ui_alt'		=> [SHIFT, SHIFT],
 		
 		'accept'		=> [SPACE, ENTER],
 		'back'			=> [BACKSPACE, ESCAPE],

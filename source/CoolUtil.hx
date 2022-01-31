@@ -21,9 +21,14 @@ class CoolUtil
 		'Normal',
 		'Hard'
 	];
+
+	public static var defaultModes:Array<String> = [
+		'None'
+	];
 	public static var defaultDifficulty:String = 'Normal'; //The chart that has no suffix and starting difficulty on Freeplay/Story Mode
 
 	public static var difficulties:Array<String> = [];
+	public static var gameplayModes:Array<String> = [];
 
 	public static function getDifficultyFilePath(num:Null<Int> = null)
 	{
@@ -44,6 +49,11 @@ class CoolUtil
 	public static function difficultyString():String
 	{
 		return difficulties[PlayState.storyDifficulty].toUpperCase();
+	}
+
+	public static function modeString():String
+	{
+		return gameplayModes[PlayState.storyGMode].toUpperCase();
 	}
 
 	inline public static function boundTo(value:Float, min:Float, max:Float):Float {

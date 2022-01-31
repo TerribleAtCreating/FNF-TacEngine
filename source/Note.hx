@@ -97,6 +97,16 @@ class Note extends FlxSprite
 						missHealth = 0.3;
 					}
 					hitCausesMiss = true;
+				case 'HD Note':
+					reloadNote('HD');
+					colorSwap.hue = 0;
+					colorSwap.saturation = 0;
+					colorSwap.brightness = 0;
+					if(isSustainNote) {
+						missHealth = 0.25;
+					} else {
+						missHealth = 0.5;
+					}
 				case 'No Animation':
 					noAnimation = true;
 			}

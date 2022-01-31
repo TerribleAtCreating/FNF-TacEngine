@@ -31,7 +31,9 @@ class FreeplayState extends MusicBeatState
 	var selector:FlxText;
 	private static var curSelected:Int = 0;
 	var curDifficulty:Int = -1;
+	var curMode:Int = -1;
 	private static var lastDifficultyName:String = '';
+	private static var lastModeName:String = '';
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
@@ -149,6 +151,7 @@ class FreeplayState extends MusicBeatState
 		
 		changeSelection();
 		changeDiff();
+		changeDiff(0, true);
 
 		var swag:Alphabet = new Alphabet(1, 0, "swag");
 
@@ -237,6 +240,7 @@ class FreeplayState extends MusicBeatState
 		var upP = controls.UI_UP_P;
 		var downP = controls.UI_DOWN_P;
 		var accepted = controls.ACCEPT;
+		var alt = controls.UI_ALT;
 		var space = FlxG.keys.justPressed.SPACE;
 		var ctrl = FlxG.keys.justPressed.CONTROL;
 
@@ -253,10 +257,14 @@ class FreeplayState extends MusicBeatState
 		}
 
 		if (controls.UI_LEFT_P)
-			changeDiff(-1);
+			changeDiff(-1, alt);
 		else if (controls.UI_RIGHT_P)
-			changeDiff(1);
-		else if (upP || downP) changeDiff();
+			changeDiff(1, alt);
+		else if (upP || downP) 
+			{
+			changeDiff();
+			changeDiff(0, true);
+			}
 
 		if (controls.BACK)
 		{
@@ -310,6 +318,7 @@ class FreeplayState extends MusicBeatState
 			PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = curDifficulty;
+			PlayState.storyGMode = curMode;
 
 			trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
 			if(colorTween != null) {
@@ -346,8 +355,10 @@ class FreeplayState extends MusicBeatState
 		vocals = null;
 	}
 
-	function changeDiff(change:Int = 0)
+	function changeDiff(change:Int = 0, isAlt:Bool = false)
 	{
+		if (!isAlt)
+		{
 		curDifficulty += change;
 
 		if (curDifficulty < 0)
@@ -363,7 +374,20 @@ class FreeplayState extends MusicBeatState
 		#end
 
 		PlayState.storyDifficulty = curDifficulty;
-		diffText.text = '< ' + CoolUtil.difficultyString() + ' >';
+		} else
+		{
+			curMode += change;
+
+		if (curMode < 0)
+			curMode = CoolUtil.gameplayModes.length-1;
+		if (curMode >= CoolUtil.gameplayModes.length)
+			curMode = 0;
+
+		lastModeName = CoolUtil.gameplayModes[curMode];
+
+		PlayState.storyGMode = curMode;
+		}
+		diffText.text = '< ' + CoolUtil.difficultyString() + ' - ' + CoolUtil.modeString() + ' >';
 		positionHighscore();
 	}
 
@@ -447,6 +471,25 @@ class FreeplayState extends MusicBeatState
 			{
 				CoolUtil.difficulties = diffs;
 			}
+		}
+
+		var modelist:Array<String> = [];
+		var unModded:Array<String> = CoolUtil.coolTextFile(Paths.txt('gModeList'));
+		for (mode in unModded) {
+			modelist.push(mode);
+		}
+		#if MODS_ALLOWED
+		var gModeTxt:String = Paths.modFolders('data/gModeList.txt');
+		if(sys.FileSystem.exists(gModeTxt)) {
+			for (modeMod in CoolUtil.coolTextFile(gModeTxt)) {
+				modelist.push(modeMod);
+			}
+		}
+		#end
+		
+		if (modelist.length > 0)
+		{
+			CoolUtil.gameplayModes = modelist;
 		}
 		
 		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));

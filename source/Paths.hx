@@ -44,7 +44,8 @@ class Paths
 		'stages',
 		'weeks',
 		'fonts',
-		'scripts'
+		'scripts',
+		'mode_scripts'
 	];
 	#end
 

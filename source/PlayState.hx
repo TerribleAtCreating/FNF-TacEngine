@@ -115,6 +115,7 @@ class PlayState extends MusicBeatState
 	public static var storyWeek:Int = 0;
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
+	public static var storyGMode:Int = 0;
 	public static var creditsWatermark:FlxText;
 	public static var songWatermark:FlxText;
 
@@ -1733,11 +1734,28 @@ class PlayState extends MusicBeatState
 
 		for (section in noteData)
 		{
+			var gModeSectionValue = callOnLuas('onSectionCreate', [CoolUtil.gameplayModes[storyGMode]]);
+			//hardcode the gmode or just .lua the hell
+			switch(CoolUtil.gameplayModes[storyGMode])
+			{
+				default:
+					gModeSectionValue = -1;
+			}
 			for (songNotes in section.sectionNotes)
 			{
+				var gModeNoteValue = callOnLuas('onNoteCreate', [CoolUtil.gameplayModes[storyGMode]]);
+				//hardcode the gmode or just .lua the hell
+				switch(CoolUtil.gameplayModes[storyGMode])
+				{
+					default:
+						gModeNoteValue = -1;
+				}
 				if(songNotes[1] > -1) { //Real notes
 					var daStrumTime:Float = songNotes[0];
 					var daNoteData:Int = Std.int(songNotes[1] % 4);
+
+					if (gModeNoteValue != -1) daNoteData = gModeNoteValue;
+					if (gModeSectionValue != -1) daNoteData = gModeSectionValue; //priority
 
 					var gottaHitNote:Bool = section.mustHitSection;
 
@@ -3689,6 +3707,13 @@ class PlayState extends MusicBeatState
 			var daAlt = '';
 			if(daNote.noteType == 'Alt Animation') daAlt = '-alt';
 
+			if(daNote.noteType == 'HD Note') {
+				if(boyfriend.animOffsets.exists('hurt')) {
+					boyfriend.playAnim('hurt', true);
+					boyfriend.specialAnim = true;
+				}
+			}
+
 			var animToPlay:String = singAnimations[Std.int(Math.abs(daNote.noteData))] + 'miss' + daAlt;
 			char.playAnim(animToPlay, true);
 		}
@@ -3796,16 +3821,20 @@ class PlayState extends MusicBeatState
 
 			if(note.hitCausesMiss) {
 				noteMiss(note);
-				if(!note.noteSplashDisabled && !note.isSustainNote) {
-					spawnNoteSplashOnNote(note);
-				}
-
 				switch(note.noteType) {
 					case 'Hurt Note': //Hurt note
 						if(boyfriend.animation.getByName('hurt') != null) {
 							boyfriend.playAnim('hurt', true);
 							boyfriend.specialAnim = true;
 						}
+					case 'HD Note':
+						if(boyfriend.animOffsets.exists('dodge')) {
+							boyfriend.playAnim('dodge', true);
+							boyfriend.specialAnim = true;
+						}
+				}
+				if(!note.noteSplashDisabled && !note.isSustainNote) {
+					spawnNoteSplashOnNote(note);
 				}
 				
 				note.wasGoodHit = true;
@@ -3851,6 +3880,12 @@ class PlayState extends MusicBeatState
 						gf.playAnim('cheer', true);
 						gf.specialAnim = true;
 						gf.heyTimer = 0.6;
+					}
+				}
+				if(note.noteType == 'HD Note') {
+					if(boyfriend.animOffsets.exists('dodge')) {
+						boyfriend.playAnim('dodge', true);
+						boyfriend.specialAnim = true;
 					}
 				}
 			}

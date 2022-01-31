@@ -19,8 +19,9 @@ class PauseSubState extends MusicBeatSubstate
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
 
 	var menuItems:Array<String> = [];
-	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Change Difficulty', 'Exit to menu'];
+	var menuItemsOG:Array<String> = ['Resume', 'Restart Song', 'Change Difficulty', 'Change Gameplay Mode', 'Exit to menu'];
 	var difficultyChoices = [];
+	var gModeChoices = [];
 	var curSelected:Int = 0;
 
 	var pauseMusic:FlxSound;
@@ -39,6 +40,12 @@ class PauseSubState extends MusicBeatSubstate
 			difficultyChoices.push(diff);
 		}
 		difficultyChoices.push('BACK');
+
+		for (i in 0...CoolUtil.gameplayModes.length) {
+			var gMode:String = '' + CoolUtil.gameplayModes[i] + ' '; //trust me, this is important
+			gModeChoices.push(gMode);
+		}
+		gModeChoices.push('BACK');
 
 		pauseMusic = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
 		pauseMusic.volume = 0;
@@ -59,7 +66,7 @@ class PauseSubState extends MusicBeatSubstate
 		add(levelInfo);
 
 		var levelDifficulty:FlxText = new FlxText(20, 15 + 32, 0, "", 32);
-		levelDifficulty.text += CoolUtil.difficultyString();
+		levelDifficulty.text += CoolUtil.difficultyString() + ' - ' + CoolUtil.modeString();
 		levelDifficulty.scrollFactor.set();
 		levelDifficulty.setFormat(Paths.font('vcr.ttf'), 32);
 		levelDifficulty.updateHitbox();
@@ -154,6 +161,14 @@ class PauseSubState extends MusicBeatSubstate
 					return;
 				}
 			} 
+			for (i in 0...gModeChoices.length-1) {
+				if(gModeChoices[i] == daSelected) {
+					PlayState.storyGMode = curSelected;
+					CustomFadeTransition.nextCamera = transCamera;
+					MusicBeatState.resetState();
+					FlxG.sound.music.volume = 0;
+				}
+			} 
 
 			switch (daSelected)
 			{
@@ -161,6 +176,9 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 				case 'Change Difficulty':
 					menuItems = difficultyChoices;
+					regenMenu();
+				case 'Change Gameplay Mode':
+					menuItems = gModeChoices;
 					regenMenu();
 				/*case 'Toggle Practice Mode':
 					PlayState.practiceMode = !PlayState.practiceMode;

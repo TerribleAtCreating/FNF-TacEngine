@@ -26,6 +26,9 @@ enum abstract Action(String) to String from String
 	var UI_LEFT_R = "ui_left-release";
 	var UI_RIGHT_R = "ui_right-release";
 	var UI_DOWN_R = "ui_down-release";
+	var UI_ALT_P = "ui_alt-press";
+	var UI_ALT = "ui_alt";
+	var UI_ALT_R = "ui_alt-release";
 	var NOTE_UP = "note_up";
 	var NOTE_LEFT = "note_left";
 	var NOTE_RIGHT = "note_right";
@@ -59,6 +62,9 @@ abstract Action(String) to String from String
 	var UI_LEFT_R = "ui_left-release";
 	var UI_RIGHT_R = "ui_right-release";
 	var UI_DOWN_R = "ui_down-release";
+	var UI_ALT_P = "ui_alt-press";
+	var UI_ALT = "ui_alt";
+	var UI_ALT_R = "ui_alt-release";
 	var NOTE_UP = "note_up";
 	var NOTE_LEFT = "note_left";
 	var NOTE_RIGHT = "note_right";
@@ -95,6 +101,7 @@ enum Control
 	UI_LEFT;
 	UI_RIGHT;
 	UI_DOWN;
+	UI_ALT;
 	NOTE_UP;
 	NOTE_LEFT;
 	NOTE_RIGHT;
@@ -131,6 +138,9 @@ class Controls extends FlxActionSet
 	var _ui_leftR = new FlxActionDigital(Action.UI_LEFT_R);
 	var _ui_rightR = new FlxActionDigital(Action.UI_RIGHT_R);
 	var _ui_downR = new FlxActionDigital(Action.UI_DOWN_R);
+	var _ui_altP =  new FlxActionDigital(Action.UI_ALT_P);
+	var _ui_alt =  new FlxActionDigital(Action.UI_ALT);
+	var _ui_altR =  new FlxActionDigital(Action.UI_ALT_R);
 	var _note_up = new FlxActionDigital(Action.NOTE_UP);
 	var _note_left = new FlxActionDigital(Action.NOTE_LEFT);
 	var _note_right = new FlxActionDigital(Action.NOTE_RIGHT);
@@ -177,6 +187,10 @@ class Controls extends FlxActionSet
 	inline function get_UI_DOWN()
 		return _ui_down.check();
 
+	public var UI_ALT(get, never):Bool;
+	inline function get_UI_ALT()
+		return _ui_alt.check();
+
 	public var UI_UP_P(get, never):Bool;
 
 	inline function get_UI_UP_P()
@@ -197,6 +211,10 @@ class Controls extends FlxActionSet
 	inline function get_UI_DOWN_P()
 		return _ui_downP.check();
 
+	public var UI_ALT_P(get, never):Bool;
+	inline function get_UI_ALT_P()
+		return _ui_altR.check();
+
 	public var UI_UP_R(get, never):Bool;
 
 	inline function get_UI_UP_R()
@@ -216,6 +234,11 @@ class Controls extends FlxActionSet
 
 	inline function get_UI_DOWN_R()
 		return _ui_downR.check();
+
+	public var UI_ALT_R(get, never):Bool;
+
+	inline function get_UI_ALT_R()
+		return _ui_altR.check();
 
 	public var NOTE_UP(get, never):Bool;
 
@@ -418,6 +441,7 @@ class Controls extends FlxActionSet
 			case UI_DOWN: _ui_down;
 			case UI_LEFT: _ui_left;
 			case UI_RIGHT: _ui_right;
+			case UI_ALT: _ui_alt;
 			case NOTE_UP: _note_up;
 			case NOTE_DOWN: _note_down;
 			case NOTE_LEFT: _note_left;
@@ -461,6 +485,10 @@ class Controls extends FlxActionSet
 				func(_ui_down, PRESSED);
 				func(_ui_downP, JUST_PRESSED);
 				func(_ui_downR, JUST_RELEASED);
+			case UI_ALT:
+				func(_ui_alt, PRESSED);
+				func(_ui_altP, JUST_PRESSED);
+				func(_ui_altR, JUST_RELEASED);
 			case NOTE_UP:
 				func(_note_up, PRESSED);
 				func(_note_upP, JUST_PRESSED);
@@ -644,6 +672,7 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.UI_DOWN, keysMap.get('ui_down'));
 				inline bindKeys(Control.UI_LEFT, keysMap.get('ui_left'));
 				inline bindKeys(Control.UI_RIGHT, keysMap.get('ui_right'));
+				inline bindKeys(Control.UI_ALT, keysMap.get('ui_alt'));
 				inline bindKeys(Control.NOTE_UP, keysMap.get('note_up'));
 				inline bindKeys(Control.NOTE_DOWN, keysMap.get('note_down'));
 				inline bindKeys(Control.NOTE_LEFT, keysMap.get('note_left'));
@@ -658,6 +687,7 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.UI_DOWN, [S]);
 				inline bindKeys(Control.UI_LEFT, [A]);
 				inline bindKeys(Control.UI_RIGHT, [D]);
+				inline bindKeys(Control.UI_ALT, [SHIFT]);
 				inline bindKeys(Control.NOTE_UP, [W]);
 				inline bindKeys(Control.NOTE_DOWN, [S]);
 				inline bindKeys(Control.NOTE_LEFT, [A]);
@@ -671,6 +701,7 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.UI_DOWN, [FlxKey.DOWN]);
 				inline bindKeys(Control.UI_LEFT, [FlxKey.LEFT]);
 				inline bindKeys(Control.UI_RIGHT, [FlxKey.RIGHT]);
+				inline bindKeys(Control.UI_ALT, [FlxKey.SHIFT]);
 				inline bindKeys(Control.NOTE_UP, [FlxKey.UP]);
 				inline bindKeys(Control.NOTE_DOWN, [FlxKey.DOWN]);
 				inline bindKeys(Control.NOTE_LEFT, [FlxKey.LEFT]);
@@ -682,7 +713,7 @@ class Controls extends FlxActionSet
 			case None: // nothing
 			case Custom: // nothing
 		}
-		#else
+		#else //nobody aint using this, right?
 		switch (scheme)
 		{
 			case Solo:
@@ -690,6 +721,7 @@ class Controls extends FlxActionSet
 				bindKeys(Control.UI_DOWN, [S, FlxKey.DOWN]);
 				bindKeys(Control.UI_LEFT, [A, FlxKey.LEFT]);
 				bindKeys(Control.UI_RIGHT, [D, FlxKey.RIGHT]);
+				bindKeys(Control.UI_ALT, [SHIFT, FlxKey.SHIFT]);
 				bindKeys(Control.NOTE_UP, [W, FlxKey.UP]);
 				bindKeys(Control.NOTE_DOWN, [S, FlxKey.DOWN]);
 				bindKeys(Control.NOTE_LEFT, [A, FlxKey.LEFT]);
@@ -703,6 +735,7 @@ class Controls extends FlxActionSet
 				bindKeys(Control.UI_DOWN, [S]);
 				bindKeys(Control.UI_LEFT, [A]);
 				bindKeys(Control.UI_RIGHT, [D]);
+				bindKeys(Control.UI_ALT, [SHIFT]);
 				bindKeys(Control.NOTE_UP, [W]);
 				bindKeys(Control.NOTE_DOWN, [S]);
 				bindKeys(Control.NOTE_LEFT, [A]);
@@ -716,6 +749,7 @@ class Controls extends FlxActionSet
 				bindKeys(Control.UI_DOWN, [FlxKey.DOWN]);
 				bindKeys(Control.UI_LEFT, [FlxKey.LEFT]);
 				bindKeys(Control.UI_RIGHT, [FlxKey.RIGHT]);
+				bindKeys(Control.UI_ALT, [FlxKey.SHIFT]);
 				bindKeys(Control.NOTE_UP, [FlxKey.UP]);
 				bindKeys(Control.NOTE_DOWN, [FlxKey.DOWN]);
 				bindKeys(Control.NOTE_LEFT, [FlxKey.LEFT]);

@@ -18,6 +18,10 @@ import flixel.util.FlxTimer;
 import lime.net.curl.CURLCode;
 import flixel.graphics.FlxGraphic;
 import WeekData;
+import openfl.utils.Assets;
+#if MODS_ALLOWED
+import sys.FileSystem;
+#end
 
 using StringTools;
 
@@ -32,7 +36,9 @@ class StoryMenuState extends MusicBeatState
 	var scoreText:FlxText;
 
 	private static var lastDifficultyName:String = '';
+	private static var lastModeName:String = '';
 	var curDifficulty:Int = 1;
+	var curMode:Int = 0;
 
 	var txtWeekTitle:FlxText;
 	var bgSprite:FlxSprite;
@@ -47,9 +53,13 @@ class StoryMenuState extends MusicBeatState
 	var grpLocks:FlxTypedGroup<FlxSprite>;
 
 	var difficultySelectors:FlxGroup;
+	var gModeSelectors:FlxGroup;
 	var sprDifficulty:FlxSprite;
+	var sprMode:FlxSprite;
 	var leftArrow:FlxSprite;
 	var rightArrow:FlxSprite;
+	var leftArrowALT:FlxSprite;
+	var rightArrowALT:FlxSprite;
 
 	override function create()
 	{
@@ -130,6 +140,8 @@ class StoryMenuState extends MusicBeatState
 
 		difficultySelectors = new FlxGroup();
 		add(difficultySelectors);
+		gModeSelectors = new FlxGroup();
+		add(gModeSelectors);
 
 		leftArrow = new FlxSprite(grpWeekText.members[0].x + grpWeekText.members[0].width + 10, grpWeekText.members[0].y + 10);
 		leftArrow.frames = ui_tex;
@@ -137,20 +149,38 @@ class StoryMenuState extends MusicBeatState
 		leftArrow.animation.addByPrefix('press', "arrow push left");
 		leftArrow.animation.play('idle');
 		leftArrow.antialiasing = ClientPrefs.globalAntialiasing;
+		leftArrowALT = new FlxSprite(grpWeekText.members[0].x + grpWeekText.members[0].width + 10, grpWeekText.members[0].y + 10);
+		leftArrowALT.frames = ui_tex;
+		leftArrowALT.animation.addByPrefix('idle', "arrow left");
+		leftArrowALT.animation.addByPrefix('press', "arrow push left");
+		leftArrowALT.animation.play('idle');
+		leftArrowALT.antialiasing = ClientPrefs.globalAntialiasing;
+		leftArrowALT.y += 95;
 		difficultySelectors.add(leftArrow);
+		gModeSelectors.add(leftArrowALT);
 
 		CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
+		CoolUtil.gameplayModes = CoolUtil.defaultModes.copy();
 		if(lastDifficultyName == '')
 		{
 			lastDifficultyName = CoolUtil.defaultDifficulty;
 		}
+
+		if(lastModeName == '')
+			{
+				lastModeName = CoolUtil.gameplayModes[0];
+			}
 		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(lastDifficultyName)));
 		
 		sprDifficulty = new FlxSprite(0, leftArrow.y);
 		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
+		sprMode = new FlxSprite(0, leftArrowALT.y);
+		sprMode.antialiasing = ClientPrefs.globalAntialiasing;
 		changeDifficulty();
+		changeGMode();
 
 		difficultySelectors.add(sprDifficulty);
+		gModeSelectors.add(sprMode);
 
 		rightArrow = new FlxSprite(leftArrow.x + 376, leftArrow.y);
 		rightArrow.frames = ui_tex;
@@ -158,7 +188,14 @@ class StoryMenuState extends MusicBeatState
 		rightArrow.animation.addByPrefix('press', "arrow push right", 24, false);
 		rightArrow.animation.play('idle');
 		rightArrow.antialiasing = ClientPrefs.globalAntialiasing;
+		rightArrowALT = new FlxSprite(leftArrowALT.x + 376, leftArrowALT.y);
+		rightArrowALT.frames = ui_tex;
+		rightArrowALT.animation.addByPrefix('idle', "arrow right");
+		rightArrowALT.animation.addByPrefix('press', "arrow push right");
+		rightArrowALT.animation.play('idle');
+		rightArrowALT.antialiasing = ClientPrefs.globalAntialiasing;
 		difficultySelectors.add(rightArrow);
+		gModeSelectors.add(rightArrowALT);
 
 		add(bgYellow);
 		add(bgSprite);
@@ -199,6 +236,7 @@ class StoryMenuState extends MusicBeatState
 		// FlxG.watch.addQuick('font', scoreText.font);
 
 		difficultySelectors.visible = !weekIsLocked(curWeek);
+		gModeSelectors.visible = !weekIsLocked(curWeek);
 
 		if (!movedBack && !selectedWeek)
 		{
@@ -216,6 +254,8 @@ class StoryMenuState extends MusicBeatState
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 			}
 
+		if (!controls.UI_ALT)
+			{
 			if (controls.UI_RIGHT)
 				rightArrow.animation.play('press')
 			else
@@ -225,13 +265,36 @@ class StoryMenuState extends MusicBeatState
 				leftArrow.animation.play('press');
 			else
 				leftArrow.animation.play('idle');
+		} else
+		{
+			if (controls.UI_RIGHT)
+				rightArrowALT.animation.play('press')
+			else
+				rightArrowALT.animation.play('idle');
 
+			if (controls.UI_LEFT)
+				leftArrowALT.animation.play('press');
+			else
+				leftArrowALT.animation.play('idle');
+		}
+
+		if (controls.UI_ALT)
+		{
+			if (controls.UI_RIGHT_P)
+				changeGMode(1);
+			else if (controls.UI_LEFT_P)
+				changeGMode(-1);
+			else if (upP || downP)
+				changeGMode();
+		} else
+		{
 			if (controls.UI_RIGHT_P)
 				changeDifficulty(1);
 			else if (controls.UI_LEFT_P)
 				changeDifficulty(-1);
 			else if (upP || downP)
 				changeDifficulty();
+		}
 
 			if (controls.ACCEPT)
 			{
@@ -293,6 +356,7 @@ class StoryMenuState extends MusicBeatState
 			if(diffic == null) diffic = '';
 
 			PlayState.storyDifficulty = curDifficulty;
+			PlayState.storyGMode = curMode;
 
 			PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
 			PlayState.campaignScore = 0;
@@ -308,6 +372,7 @@ class StoryMenuState extends MusicBeatState
 	}
 
 	var tweenDifficulty:FlxTween;
+	var tweenMode:FlxTween;
 	var lastImagePath:String;
 	function changeDifficulty(change:Int = 0):Void
 	{
@@ -344,11 +409,56 @@ class StoryMenuState extends MusicBeatState
 		}
 		lastImagePath = newImagePath;
 		lastDifficultyName = CoolUtil.difficulties[curDifficulty];
+		lastModeName = CoolUtil.gameplayModes[curMode];
+
 
 		#if !switch
 		intendedScore = Highscore.getWeekScore(WeekData.weeksList[curWeek], curDifficulty);
 		#end
 	}
+
+	function changeGMode(change:Int = 0):Void
+		{
+			curMode += change;
+	
+			if (curMode < 0)
+				curMode = CoolUtil.gameplayModes.length-1;
+			if (curMode >= CoolUtil.gameplayModes.length)
+				curMode = 0;
+	
+			var image:Dynamic = Paths.image('gameplaymodes/' + Paths.formatToSongPath(CoolUtil.gameplayModes[curMode]));
+			var newImagePath:String = '';
+			if(image is FlxGraphic)
+			{
+				var graphic:FlxGraphic = image;
+				newImagePath = graphic.assetsKey;
+			}
+			else
+				newImagePath = image;
+	
+			if(newImagePath != lastImagePath)
+			{
+				sprMode.loadGraphic(image);
+				sprMode.x = leftArrowALT.x + 60;
+				sprMode.x += (308 - sprMode.width) / 2;
+				sprMode.alpha = 0;
+				sprMode.y = leftArrowALT.y - 15;
+	
+				if(tweenMode != null) tweenMode.cancel();
+				tweenMode = FlxTween.tween(sprMode, {y: leftArrowALT.y + 15, alpha: 1}, 0.07, {onComplete: function(twn:FlxTween)
+				{
+					tweenMode = null;
+				}});
+			}
+			lastImagePath = newImagePath;
+			lastDifficultyName = CoolUtil.difficulties[curDifficulty];
+			lastModeName = CoolUtil.gameplayModes[curMode];
+	
+	
+			#if !switch
+			intendedScore = Highscore.getWeekScore(WeekData.weeksList[curWeek], curDifficulty);
+			#end
+		}
 
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
@@ -414,7 +524,26 @@ class StoryMenuState extends MusicBeatState
 				CoolUtil.difficulties = diffs;
 			}
 		}
+
+		var modelist:Array<String> = [];
+		var unModded:Array<String> = CoolUtil.coolTextFile(Paths.txt('gModeList'));
+		for (mode in unModded) {
+			modelist.push(mode);
+		}
+		#if MODS_ALLOWED
+		var gModeTxt:String = Paths.modFolders('data/gModeList.txt');
+		if(sys.FileSystem.exists(gModeTxt)) {
+			for (modeMod in CoolUtil.coolTextFile(gModeTxt)) {
+				modelist.push(modeMod);
+			}
+		}
+		#end
 		
+		if (modelist.length > 0)
+		{
+			CoolUtil.gameplayModes = modelist;
+		}
+		trace(CoolUtil.gameplayModes);
 		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
 		var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
 		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);
