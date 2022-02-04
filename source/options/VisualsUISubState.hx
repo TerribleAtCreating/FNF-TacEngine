@@ -98,7 +98,7 @@ class VisualsUISubState extends BaseOptionsMenu
 			'If checked, shows a counter that',
 			'judgementCounter',
 			'bool',
-			false);
+			true);
 		addOption(option);
 		
 		#if !mobile
