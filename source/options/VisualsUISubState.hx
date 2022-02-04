@@ -94,6 +94,12 @@ class VisualsUISubState extends BaseOptionsMenu
 			'bool',
 			false);
 		addOption(option);
+		var option:Option = new Option('Enable Judgement Counter',
+			'If checked, shows a counter that',
+			'judgementCounter',
+			'bool',
+			false);
+		addOption(option);
 		
 		#if !mobile
 		var option:Option = new Option('FPS Counter',

@@ -29,6 +29,7 @@ class ClientPrefs {
 	public static var healthBarAlpha:Float = 1;
 	public static var controllerMode:Bool = false;
 	public static var hideWatermark:Bool = false;
+	public static var judgementCounter:Bool = true;
 	public static var gameplaySettings:Map<String, Dynamic> = [
 		'scrollspeed' => 1.0,
 		'songspeed' => 1.0,
@@ -115,6 +116,7 @@ class ClientPrefs {
 		FlxG.save.data.gameplaySettings = gameplaySettings;
 		FlxG.save.data.controllerMode = controllerMode;
 		FlxG.save.data.hideWatermark = hideWatermark;
+		FlxG.save.data.judgementCounter = judgementCounter;
 	
 		FlxG.save.flush();
 
@@ -221,6 +223,9 @@ class ClientPrefs {
 		}
 		if(FlxG.save.data.hideWatermark != null) {
 			hideWatermark = FlxG.save.data.hideWatermark;
+		}
+		if(FlxG.save.data.judgementCounter != null) {
+			judgementCounter = FlxG.save.data.judgementCounter;
 		}
 		if(FlxG.save.data.gameplaySettings != null)
 		{
