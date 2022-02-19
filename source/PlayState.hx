@@ -1175,7 +1175,8 @@ class PlayState extends MusicBeatState
 				case 'senpai' | 'roses' | 'thorns':
 					if(daSong == 'roses') FlxG.sound.play(Paths.sound('ANGRY'));
 					schoolIntro(doof);
-
+				case 'ugh' | 'guns' | 'stress':
+					startVideo(daSong + 'Cutscene');
 				default:
 					startCountdown();
 			}
@@ -1750,28 +1751,11 @@ class PlayState extends MusicBeatState
 
 		for (section in noteData)
 		{
-			var gModeSectionValue = callOnLuas('onSectionCreate', [CoolUtil.gameplayModes[storyGMode]]);
-			//hardcode the gmode or just .lua the hell
-			switch(CoolUtil.gameplayModes[storyGMode])
-			{
-				default:
-					gModeSectionValue = -1;
-			}
 			for (songNotes in section.sectionNotes)
 			{
-				var gModeNoteValue = callOnLuas('onNoteCreate', [CoolUtil.gameplayModes[storyGMode]]);
-				//hardcode the gmode or just .lua the hell
-				switch(CoolUtil.gameplayModes[storyGMode])
-				{
-					default:
-						gModeNoteValue = -1;
-				}
 				if(songNotes[1] > -1) { //Real notes
 					var daStrumTime:Float = songNotes[0];
 					var daNoteData:Int = Std.int(songNotes[1] % 4);
-
-					if (gModeNoteValue != -1) daNoteData = gModeNoteValue;
-					if (gModeSectionValue != -1) daNoteData = gModeSectionValue; //priority
 
 					var gottaHitNote:Bool = section.mustHitSection;
 
