@@ -141,6 +141,8 @@ class PlayState extends MusicBeatState
 	public var strumLineNotes:FlxTypedGroup<StrumNote>;
 	public var opponentStrums:FlxTypedGroup<StrumNote>;
 	public var playerStrums:FlxTypedGroup<StrumNote>;
+	public var strumNotesX:Array<Float> = [0,0,0,0,0,0,0,0];
+	public var strumNotesY:Array<Float> = [0,0,0,0,0,0,0,0];
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash>;
 
 	public var camZooming:Bool = false;
@@ -1016,7 +1018,7 @@ class PlayState extends MusicBeatState
 		judgementCounter.scrollFactor.set();
 		judgementCounter.cameras = [camHUD];
 		judgementCounter.screenCenter(Y);
-		judgementCounter.text = 'Sicks: ${sicks}\nGoods: ${goods}\nBads: ${bads}\nShits: ${shits}\nMisses: ${songMisses}';
+		judgementCounter.text = 'Total: ${songHits}\nSicks: ${sicks}\nGoods: ${goods}\nBads: ${bads}\nShits: ${shits}\nMisses: ${songMisses}';
 		if (ClientPrefs.judgementCounter)
 			{
 				add(judgementCounter);
@@ -1184,7 +1186,7 @@ class PlayState extends MusicBeatState
 		} else {
 			startCountdown();
 		}
-		RecalculateRating();
+		recalculateRating();
 
 		//PRECACHING MISS SOUNDS BECAUSE I THINK THEY CAN LAG PEOPLE AND FUCK THEM UP IDK HOW HAXE WORKS
 		CoolUtil.precacheSound('missnote1');
@@ -1669,6 +1671,15 @@ class PlayState extends MusicBeatState
 	function startSong():Void
 	{
 		startingSong = false;
+		for (i in 0...playerStrums.length) {
+			strumNotesX[i] = opponentStrums.members[i].x;
+			strumNotesY[i] = opponentStrums.members[i].y;
+
+			strumNotesX[i+4] = playerStrums.members[i].x;
+			strumNotesY[i+4] = playerStrums.members[i].y;
+
+			//trace("Strum1 X = ", hazardModChartDefaultStrumX[i+4]);
+		}
 
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
@@ -3340,7 +3351,7 @@ class PlayState extends MusicBeatState
 			songScore += score;
 			songHits++;
 			totalPlayed++;
-			RecalculateRating();
+			recalculateRating();
 
 			if(ClientPrefs.scoreZoom)
 			{
@@ -3697,7 +3708,7 @@ class PlayState extends MusicBeatState
 		if(!practiceMode) songScore -= 10;
 		
 		totalPlayed++;
-		RecalculateRating();
+		recalculateRating();
 
 		var char:Character = boyfriend;
 		if(daNote.noteType == 'GF Sing') {
@@ -3744,7 +3755,7 @@ class PlayState extends MusicBeatState
 				songMisses++;
 			}
 			totalPlayed++;
-			RecalculateRating();
+			recalculateRating();
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
@@ -3776,6 +3787,10 @@ class PlayState extends MusicBeatState
 			dad.heyTimer = 0.6;
 		} else if(!note.noAnimation) {
 			var altAnim:String = "";
+			if(!note.isSustainNote && ClientPrefs.noteJumping){
+				opponentStrums.members[note.noteData].y = strumNotesY[note.noteData] + (ClientPrefs.downScroll ? 22: -22);
+				FlxTween.tween(opponentStrums.members[note.noteData], {y: strumNotesY[note.noteData]}, 0.125, {ease: FlxEase.cubeOut});
+			}
 
 			var curSection:Int = Math.floor(curStep / 16);
 			if (SONG.notes[curSection] != null)
@@ -3857,9 +3872,15 @@ class PlayState extends MusicBeatState
 			}
 			health += note.hitHealth * healthGain;
 
+			if(!note.isSustainNote && ClientPrefs.noteJumping){
+				playerStrums.members[note.noteData].y = strumNotesY[note.noteData] + (ClientPrefs.downScroll ? 22: -22);
+				FlxTween.tween(playerStrums.members[note.noteData], {y: strumNotesY[note.noteData]}, 0.125, {ease: FlxEase.cubeOut});
+			}
+
 			if(!note.noAnimation) {
 				var daAlt = '';
 				if(note.noteType == 'Alt Animation') daAlt = '-alt';
+
 	
 				var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
 
@@ -4320,7 +4341,7 @@ class PlayState extends MusicBeatState
 	public var ratingName:String = '?';
 	public var ratingPercent:Float;
 	public var ratingFC:String;
-	public function RecalculateRating() {
+	public function recalculateRating() {
 		setOnLuas('score', songScore);
 		setOnLuas('misses', songMisses);
 		setOnLuas('hits', songHits);
@@ -4366,7 +4387,7 @@ class PlayState extends MusicBeatState
 		setOnLuas('rating', ratingPercent);
 		setOnLuas('ratingName', ratingName);
 		setOnLuas('ratingFC', ratingFC);
-		judgementCounter.text = 'Sicks: ${sicks}\nGoods: ${goods}\nBads: ${bads}\nShits: ${shits}\nMisses: ${songMisses}';
+		judgementCounter.text = 'Total: ${songHits}\nSicks: ${sicks}\nGoods: ${goods}\nBads: ${bads}\nShits: ${shits}\nMisses: ${songMisses}';
 	}
 
 	#if ACHIEVEMENTS_ALLOWED

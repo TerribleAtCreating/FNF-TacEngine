@@ -63,6 +63,13 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
+		var option:Option = new Option('Note Jumping', //Name
+			'If checked, strum notes will jump when a note is hit.', //Description
+			'noteJumping', //Save data variable name
+			'bool', //Variable type
+			true); //Default value
+		addOption(option);
+
 		var option:Option = new Option('Disable Reset Button',
 			"If checked, pressing Reset won't do anything.",
 			'noReset',
