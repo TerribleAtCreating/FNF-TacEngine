@@ -63,11 +63,18 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
-		var option:Option = new Option('Note Jumping', //Name
-			'If checked, strum notes will jump when a note is hit.', //Description
-			'noteJumping', //Save data variable name
-			'bool', //Variable type
-			true); //Default value
+		var option:Option = new Option('Pussy Input',
+			"If checked, you only need to hold instead of pressing.\nAlso classifies you as a pussy. Pussies do not get saved scores.",
+			'pussyInput',
+			'bool',
+			false);
+		addOption(option);
+
+		var option:Option = new Option('Note Jumping',
+			'If checked, strum notes will jump when a note is hit.',
+			'noteJumping',
+			'bool',
+			true);
 		addOption(option);
 
 		var option:Option = new Option('Disable Reset Button',
