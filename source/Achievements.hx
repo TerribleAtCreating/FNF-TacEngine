@@ -6,11 +6,22 @@ import flixel.tweens.FlxTween;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
+#if MODS_ALLOWED
+import sys.FileSystem;
+import sys.io.File;
+import haxe.Json;
+#end
 
 using StringTools;
 
+typedef CustomAward = {
+	var awardName:String;
+	var description:String;
+	var hidden:Bool;
+	//yeah its this short, so what?
+}
 class Achievements {
-	public static var achievementsStuff:Array<Dynamic> = [ //Name, Description, Achievement save tag, Hidden achievement
+	public static var defaultAchievementsStuff:Array<Dynamic> = [ //Name, Description, Achievement save tag, Hidden achievement
 		["Freaky on a Friday Night",	"Play on a Friday... Night.",						'friday_night_play',	 true],
 		["She Calls Me Daddy Too",		"Beat Week 1 on Hard with no Misses.",				'week1_nomiss',			false],
 		["No More Tricks",				"Beat Week 2 on Hard with no Misses.",				'week2_nomiss',			false],
@@ -28,6 +39,8 @@ class Achievements {
 		["Toaster Gamer",				"Have you tried to run the game on a toaster?",		'toastie',				false],
 		["Debugger",					"Beat the \"Test\" Stage from the Chart Editor.",	'debugger',				 true]
 	];
+
+	public static var achievementsStuff:Array<Dynamic> = defaultAchievementsStuff;
 	public static var achievementsMap:Map<String, Bool> = new Map<String, Bool>();
 
 	public static var henchmenDeath:Int = 0;
@@ -35,6 +48,65 @@ class Achievements {
 		FlxG.log.add('Completed achievement "' + name +'"');
 		achievementsMap.set(name, true);
 		FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+	}
+
+	public function reloadAchievements()
+	{
+		achievementsStuff = defaultAchievementsStuff;
+		#if MODS_ALLOWED
+		var directories:Array<String> = [''];
+		for (folder in Paths.getModDirectories())
+		{
+			directories.push(folder);
+		}
+		for (directory in directories)
+		{
+			var theList = mods(directory + '/achievements/awardsList.txt');
+			if (directory == '')
+			{
+				theList = mods('achievements/awardsList.txt');
+			}
+			if (FileSystem.exists(theList))
+			{
+				var content = File.getContent(theList);
+				var awards:Array<String> = content.split('\n');
+				for (award in awards)
+				{
+					var awardDesc:String = "No description was provided.";
+					var awardName:String = award;
+					var isHidden:Bool = false;
+
+					var moddyFile:String = Paths.modFolders('achievements/' + name + '.json');
+					var awardJson = null;
+
+					if(FileSystem.exists(moddyFile))
+					{
+						awardJson = File.getContent(moddyFile).trim();
+						while (!awardJson.endsWith("}"))
+						{
+							awardJson = awardJson.substr(0, awardJson.length - 1);
+							// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
+						}
+
+						var stuff:CustomAward = cast Json.parse(awardJson);
+						if (stuff.name != null && stuff.name.length > 0)
+						{
+							awardName = stuff.name;
+						}
+						if (stuff.description != null && stuff.description.length > 0)
+						{
+							awardDesc = stuff.name;
+						}
+						if (stuff.hidden != null)
+						{
+							isHidden = stuff.hidden;
+						}
+						achievementssStuff.push([awardName, awardDesc, award, isHidden])
+					}
+				}
+			}
+		}
+		#end
 	}
 
 	public static function isAchievementUnlocked(name:String) {
@@ -131,7 +203,51 @@ class AchievementObject extends FlxSpriteGroup {
 		var achievementBG:FlxSprite = new FlxSprite(60, 50).makeGraphic(420, 120, FlxColor.BLACK);
 		achievementBG.scrollFactor.set();
 
-		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10).loadGraphic(Paths.image('achievementgrid'), true, 150, 150);
+		var iconPath = Paths.image('achievementgrid');
+		var awardName = null;
+		var awardDesc = null;
+		if (checkModAward(name))
+		{
+			awardName = Achievements.achievementsStuff[id][0];
+			awardDesc = Achievements.achievementsStuff[id][1];
+		}
+		//i think this is gonna be unneccessarily stupid
+		#if MODS_ALLOWED
+		if (checkModAward(name))
+		{
+			var modsIconPath = Paths.modFolders('achievements/' + name + '.png');
+			if(FileSystem.exists(modsIconPath)) {
+				iconPath = modsIconPath;
+			} else {
+				iconPath = Paths.image('unknownMod', 'preload');
+			}
+			var moddyFile:String = Paths.modFolders('achievements/' + name + '.json');
+			var awardJson = null;
+			if(FileSystem.exists(moddyFile))
+			{
+				awardJson = File.getContent(moddyFile).trim();
+				while (!awardJson.endsWith("}"))
+				{
+					awardJson = awardJson.substr(0, awardJson.length - 1);
+					// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
+				}
+				var stuff:CustomAward = cast Json.parse(awardJson);
+				if (stuff.name != null)
+				{
+					awardName = stuff.name;
+				} else {
+					awardName = name;
+				}
+				if (stuff.description != null)
+				{
+					awardDesc = stuff.name;
+				} else {
+					awardDesc = "No description was provided.";
+				}
+			}
+		}
+		#end
+		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10).loadGraphic(iconPath, true, 150, 150);
 		achievementIcon.animation.add('icon', [id], 0, false, false);
 		achievementIcon.animation.play('icon');
 		achievementIcon.scrollFactor.set();
@@ -139,11 +255,11 @@ class AchievementObject extends FlxSpriteGroup {
 		achievementIcon.updateHitbox();
 		achievementIcon.antialiasing = ClientPrefs.globalAntialiasing;
 
-		var achievementName:FlxText = new FlxText(achievementIcon.x + achievementIcon.width + 20, achievementIcon.y + 16, 280, Achievements.achievementsStuff[id][0], 16);
+		var achievementName:FlxText = new FlxText(achievementIcon.x + achievementIcon.width + 20, achievementIcon.y + 16, 280, awardName, 16);
 		achievementName.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT);
 		achievementName.scrollFactor.set();
 
-		var achievementText:FlxText = new FlxText(achievementName.x, achievementName.y + 32, 280, Achievements.achievementsStuff[id][1], 16);
+		var achievementText:FlxText = new FlxText(achievementName.x, achievementName.y + 32, 280, awardDesc, 16);
 		achievementText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT);
 		achievementText.scrollFactor.set();
 
@@ -173,10 +289,28 @@ class AchievementObject extends FlxSpriteGroup {
 		}});
 	}
 
+	private function checkModAward(aName:String)
+	{
+		var isMod = false;
+		#if MODS_ALLOWED
+		var awardListPath = Paths.modFolders('achievements/awardsList.txt');
+		if (FileSystem.exists(awardListPath))
+		{
+			var awards = CoolUtil.coolTextFile(awardListPath);
+			if (awards.contains(aName))
+			{
+				isMod = true;
+			}
+		}
+		#end
+		return isMod;
+	}
+
 	override function destroy() {
 		if(alphaTween != null) {
 			alphaTween.cancel();
 		}
 		super.destroy();
 	}
+	
 }
