@@ -32,6 +32,7 @@ class Paths
 	#end
 	
 	public static var ignoreModFolders:Array<String> = [
+		'achievements',
 		'characters',
 		'custom_events',
 		'custom_notetypes',

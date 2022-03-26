@@ -3151,6 +3151,7 @@ class PlayState extends MusicBeatState
 		seenCutscene = false;
 
 		#if ACHIEVEMENTS_ALLOWED
+		Achievements.reloadAchievements();
 		if(achievementObj != null) {
 			return;
 		} else {
@@ -4443,7 +4444,7 @@ class PlayState extends MusicBeatState
 							unlock = true;
 						}
 					case 'oversinging':
-						if(boyfriend.holdTimer >= 20 && !usedPractice) {
+						if(boyfriend.holdTimer >= 10 && !usedPractice) {
 							unlock = true;
 						}
 					case 'hype':
