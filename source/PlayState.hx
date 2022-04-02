@@ -51,6 +51,10 @@ import Achievements;
 import StageData;
 import FunkinLua;
 import DialogueBoxPsych;
+import Shaders;
+#if windows
+import Shaders;
+#end
 
 #if MODS_ALLOWED
 import sys.FileSystem;
@@ -189,7 +193,9 @@ class PlayState extends MusicBeatState
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 	var dialogueJson:DialogueFile = null;
-
+	#if windows
+	public var shaderSprite:FlxSprite = null;
+	#end
 	var halloweenBG:BGSprite;
 	var halloweenWhite:BGSprite;
 
@@ -731,6 +737,16 @@ class PlayState extends MusicBeatState
 						filesPushed.push(file);
 					}
 				}
+			}
+		}
+
+		var gMode = CoolUtil.gameplayModes[storyGMode].toLowerCase();
+		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
+		{
+			var scriptPath = Paths.mods(Paths.currentModDirectory + '/mode_scripts/'+ gMode);
+			if(FileSystem.exists(scriptPath))
+			{
+				luaArray.push(new FunkinLua(scriptPath));
 			}
 		}
 		#end
@@ -2097,7 +2113,13 @@ class PlayState extends MusicBeatState
 		}*/
 
 		callOnLuas('onUpdate', [elapsed]);
-
+		#if windows
+		if (shaderSprite != null)
+		{
+			var shad = cast(shaderSprite.shader, Shaders.GlitchShader);
+			shad.uTime.value[0] += elapsed;
+		}
+		#end
 		switch (curStage)
 		{
 			case 'schoolEvil':
@@ -4472,7 +4494,7 @@ class PlayState extends MusicBeatState
 						}
 					default: //for those custom awards
 						var luaCheck = callOnLuas('onCheckForAchievement', [achievementName]);
-						if (luaCheck == FunkinLua.Function_Continue) unlock = true;
+						if (luaCheck == true) unlock = true;
 				}
 
 				if(unlock) {

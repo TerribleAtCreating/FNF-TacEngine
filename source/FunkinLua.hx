@@ -29,7 +29,9 @@ import sys.io.File;
 import Type.ValueType;
 import Controls;
 import DialogueBoxPsych;
-
+#if windows
+import Shaders;
+#end
 #if desktop
 import Discord;
 #end
@@ -267,6 +269,14 @@ class FunkinLua {
 				}
 				setGroupStuff(leArray, variable, value);
 			}
+		});
+
+		Lua_helper.add_callback(lua, "setNoteData", function(index:Int, value:Int) {
+			var strumTime = PlayState.instance.unspawnNotes[index].strumTime;
+			var isHold = PlayState.instance.unspawnNotes[index].isSustainNote;
+			var oldNote = PlayState.instance.unspawnNotes[index-1];
+			var gottaHit = PlayState.instance.unspawnNotes[index].mustPress;
+			PlayState.instance.unspawnNotes[index] = new Note(strumTime, value%4, oldNote, isHold, false, gottaHit);
 		});
 		Lua_helper.add_callback(lua, "removeFromGroup", function(obj:String, index:Int, dontDestroy:Bool = false) {
 			if(Std.isOfType(Reflect.getProperty(getInstance(), obj), FlxTypedGroup)) {
@@ -1001,6 +1011,19 @@ class FunkinLua {
 			}
 			luaTrace("Object " + obj + " doesn't exist!");
 			return false;
+		});
+		Lua_helper.add_callback(lua, "setGlitchSprite", function(obj:String) {
+			#if windows
+			//the code here assumes that shaders are always active so thats bad
+			var testshader:Shaders.GlitchEffect = new Shaders.GlitchEffect();
+			testshader.waveAmplitude = 0.1;
+			testshader.waveFrequency = 5;
+			testshader.waveSpeed = 2;
+			if(PlayState.instance.modchartSprites.exists(obj)) {
+				PlayState.instance.modchartSprites.get(obj).shader = testshader.shader;
+				PlayState.instance.shaderSprite = PlayState.instance.modchartSprites.get(obj);
+			}
+			#end
 		});
 		Lua_helper.add_callback(lua, "startDialogue", function(dialogueFile:String, music:String = null) {
 			var path:String = Paths.modsJson(Paths.formatToSongPath(PlayState.SONG.song) + '/' + dialogueFile);
