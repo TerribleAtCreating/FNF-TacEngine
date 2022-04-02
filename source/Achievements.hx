@@ -15,6 +15,7 @@ import haxe.Json;
 using StringTools;
 
 typedef CustomAward = {
+	//JSON variables
 	var name:String;
 	var description:String;
 	var hidden:Bool;
@@ -48,6 +49,15 @@ class Achievements {
 		FlxG.log.add('Completed achievement "' + name +'"');
 		achievementsMap.set(name, true);
 		FlxG.sound.play(Paths.sound('confirmMenu'), 0.7);
+	}
+	public static function createAwardFile()
+	{
+		var awardFile:CustomAward = {
+			name: "Name",
+			description: "Description",
+			hidden: false
+		};
+		return awardFile;
 	}
 
 	public static function reloadAchievements()
@@ -151,16 +161,16 @@ class Achievements {
 class AttachedAchievement extends FlxSprite {
 	public var sprTracker:FlxSprite;
 	private var tag:String;
-	public function new(x:Float = 0, y:Float = 0, name:String) {
+	public function new(x:Float = 0, y:Float = 0, name:String, forceUnlock:Bool = false) {
 		super(x, y);
 
-		changeAchievement(name);
+		changeAchievement(name, forceUnlock);
 		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
-	public function changeAchievement(tag:String) {
+	public function changeAchievement(tag:String, forceUnlock:Bool) {
 		this.tag = tag;
-		reloadAchievementImage();
+		reloadAchievementImage(forceUnlock);
 	}
 
 	public function dotheCheckMod(tag:String) {
@@ -185,9 +195,24 @@ class AttachedAchievement extends FlxSprite {
 		animation.play('icon');
 	}
 
-	public function reloadAchievementImage() {
-		if(Achievements.isAchievementUnlocked(tag)) {
-			dotheCheckMod(tag);
+	public function awardEditorImage(tag) {
+		#if MODS_ALLOWED
+		var modsIconPath = Paths.modFolders('achievements/' + tag + '.png');
+		if(FileSystem.exists(modsIconPath)) {
+			loadGraphic(Paths.modFolders('achievements/' + tag + '.png'), true, 150, 150);
+		} else {
+			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
+		}
+		#else
+			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
+		#end
+		animation.add('icon', [0], 0, false, false);
+		animation.play('icon');
+	}
+
+	public function reloadAchievementImage(forceUnlock) {
+		if(Achievements.isAchievementUnlocked(tag) || forceUnlock) {
+			if (!forceUnlock) dotheCheckMod(tag); else awardEditorImage(tag);
 		} else {
 			loadGraphic(Paths.image('lockedachievement'));
 		}
