@@ -20,6 +20,7 @@ import flixel.util.FlxColor;
 import flixel.FlxBasic;
 import flixel.FlxObject;
 import flixel.FlxSprite;
+import flixel.math.FlxMath;
 import openfl.display.BlendMode;
 import openfl.utils.Assets;
 #if sys
@@ -584,7 +585,16 @@ class FunkinLua {
 				return Reflect.setProperty(leClass, variables[variables.length-1], value);
 			}
 		});*/
-		
+		//playstate dot instance spam
+		Lua_helper.add_callback(lua, "changeHealthIcon", function(char:String = 'dad', name:String) {
+			if (char == 'dad')
+			{
+			PlayState.instance.iconP2.changeIcon(name);
+			} else if (char == 'bf')
+			{
+			PlayState.instance.iconP1.changeIcon(name);
+			}
+		});
 		//stupid bietch ass functions
 		Lua_helper.add_callback(lua, "addScore", function(value:Int = 0) {
 			PlayState.instance.songScore += value;

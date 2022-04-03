@@ -1059,18 +1059,17 @@ class PlayState extends MusicBeatState
 		+ CoolUtil.modeString()
 		+ " // L Engine v0.1", 16);
 		//+ " ", 16);
+
 		songWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		songWatermark.scrollFactor.set();
 		songWatermark.cameras = [camHUD];
 		add(songWatermark);
-		if (creditsText)
-		{
-			creditsWatermark = new FlxText(4, healthBarBG.y + 50, 0, credits, 16);
-			creditsWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-			creditsWatermark.scrollFactor.set();
-			add(creditsWatermark);
-			creditsWatermark.cameras = [camHUD];
-		}
+
+		creditsWatermark = new FlxText(4, healthBarBG.y + 50, 0, credits, 16);
+		creditsWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		creditsWatermark.scrollFactor.set();
+		add(creditsWatermark);
+		creditsWatermark.cameras = [camHUD];
 	}
 
 		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
@@ -3024,20 +3023,22 @@ class PlayState extends MusicBeatState
 					});
 				}
 			case 'Change Extra Text':
-			if (!ClientPrefs.hideWatermark)
-				{
 				var credits:String = '';
 				credits = value1;
-				var creditsText:Bool = credits != '';
+				var creditsText:Bool = credits.length > 0;
 				var textYPos:Float = healthBarBG.y + 50;
 				if (creditsText)
 				{
-					textYPos = healthBarBG.y + 30;
+				textYPos = healthBarBG.y + 30;
 				}
-				songWatermark.y = textYPos;
-				creditsWatermark.text = credits;
+				if (!ClientPrefs.hideWatermark)
+				{
+					if (creditsWatermark != null)
+					{
+						creditsWatermark.text = credits;
+					}
+					songWatermark.y = textYPos;
 				}
-			
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
