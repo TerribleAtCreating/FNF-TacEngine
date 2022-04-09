@@ -26,6 +26,7 @@ class CoolUtil
 		'None'
 	];
 	public static var defaultDifficulty:String = 'Normal'; //The chart that has no suffix and starting difficulty on Freeplay/Story Mode
+	public static var nothingGMode:String = 'None'; //mode that doesn't do anything
 
 	public static var difficulties:Array<String> = [];
 	public static var gameplayModes:Array<String> = [];

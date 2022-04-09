@@ -254,6 +254,18 @@ class Paths
 		
 		return null;
 	}
+
+	inline static public function mode_script(gmode:String):String
+	{
+		#if MODS_ALLOWED
+			var modMode = modFolders('mode_scripts/' + gmode + '.lua')
+			if (FileSystem.exists(modMode)) return modMode;
+		#end
+		var path = getPreloadPath('mods_scripts/$gmode.lua');
+		if (OpenFlAssets.exists(path, TEXT)) return path;
+
+		return null;
+	}
 	
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
@@ -400,6 +412,7 @@ class Paths
 	inline static public function modsAwardJson(key:String) {
 		return modFolders('achievements/' + key + '.json');
 	}
+
 
 	static public function modFolders(key:String) {
 		if(currentModDirectory != null && currentModDirectory.length > 0) {

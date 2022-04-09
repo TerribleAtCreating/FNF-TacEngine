@@ -745,13 +745,10 @@ class PlayState extends MusicBeatState
 		}
 
 		var gMode = CoolUtil.gameplayModes[storyGMode].toLowerCase();
-		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
+		var scrPath = Paths.mode_script(gMode)
+		if(gMode != CoolUtil.nothingGMode.toLowerCase() && scrPath != null)
 		{
-			var scriptPath = Paths.mods(Paths.currentModDirectory + '/mode_scripts/'+ gMode);
-			if(FileSystem.exists(scriptPath))
-			{
-				luaArray.push(new FunkinLua(scriptPath));
-			}
+			luaArray.push(new FunkinLua(scrPath));
 		}
 		#end
 		
