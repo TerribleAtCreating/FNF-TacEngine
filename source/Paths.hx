@@ -258,7 +258,7 @@ class Paths
 	inline static public function mode_script(gmode:String):String
 	{
 		#if MODS_ALLOWED
-			var modMode = modFolders('mode_scripts/' + gmode + '.lua')
+			var modMode = modFolders('mode_scripts/' + gmode + '.lua');
 			if (FileSystem.exists(modMode)) return modMode;
 		#end
 		var path = getPreloadPath('mods_scripts/$gmode.lua');
