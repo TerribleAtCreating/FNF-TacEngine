@@ -484,7 +484,7 @@ class FunkinLua {
 			}
 		});
 
-		Lua_helper.add_callback(lua, "noteSetProperty", function(note:Int, variable:String) {
+		Lua_helper.add_callback(lua, "noteGetProperty", function(note:Int, variable:String) {
 			if(note < 0) note = 0;
 			var strumnote:StrumNote = PlayState.instance.strumLineNotes.members[note % PlayState.instance.strumLineNotes.length];
 			if(strumnote != null) {
