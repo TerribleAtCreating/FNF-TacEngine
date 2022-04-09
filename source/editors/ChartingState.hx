@@ -1199,6 +1199,7 @@ class ChartingState extends MusicBeatState
 	var colorSine:Float = 0;
 	override function update(elapsed:Float)
 	{
+		stepperSusLength.stepSize = Conductor.stepCrochet / 2;
 		curStep = recalculateSteps();
 
 		if(FlxG.sound.music.time < 0) {

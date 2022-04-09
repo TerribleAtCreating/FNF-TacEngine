@@ -676,6 +676,10 @@ class PlayState extends MusicBeatState
 					bg.antialiasing = false;
 					add(bg);
 				}
+			case 'tank': //Week 7: Ugh, Guns
+				var tankSky = new BGSprite('tankSky', -400, -400, 0, 0);
+
+				add(tankSky);
 		}
 
 		if(isPixelStage) {
@@ -1020,10 +1024,10 @@ class PlayState extends MusicBeatState
 		add(iconP2);
 		reloadHealthBarColors();
 
-		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
+		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 17);
 		scoreTxt.setFormat(Paths.font("comic-sans.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
-		scoreTxt.borderSize = 1.25;
+		scoreTxt.borderSize = 1;
 		scoreTxt.visible = !ClientPrefs.hideHud;
 		add(scoreTxt);
 

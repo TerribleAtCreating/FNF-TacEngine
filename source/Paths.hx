@@ -232,6 +232,28 @@ class Paths
 		#end
 		return getPath('images/$key.png', IMAGE, library);
 	}
+
+	inline static public function award_icon(key:String):Dynamic
+	{
+		#if MODS_ALLOWED
+		var modIcon:FlxGraphic = null;
+		if(FileSystem.exists(modFolders('achievements/' + key + '.png'))) {
+			if(!customImagesLoaded.exists(key)) {
+				var newBitmap:BitmapData = BitmapData.fromFile(modFolders('achievements/' + key + '.png'));
+				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(newBitmap, false, key);
+				newGraphic.persist = true;
+				FlxG.bitmap.addGraphic(newGraphic);
+				customImagesLoaded.set(key, true);
+			}
+			modIcon = FlxG.bitmap.get(key);
+		}
+		if(modIcon != null) return modIcon;
+		#end
+		var path = getPreloadPath('images/achievements/$key.png');
+		if (OpenFlAssets.exists(path, IMAGE)) return path;
+		
+		return null;
+	}
 	
 	static public function getTextFromFile(key:String, ?ignoreMods:Bool = false):String
 	{
@@ -373,6 +395,10 @@ class Paths
 
 	inline static public function modsTxt(key:String) {
 		return modFolders('images/' + key + '.txt');
+	}
+
+	inline static public function modsAwardJson(key:String) {
+		return modFolders('achievements/' + key + '.json');
 	}
 
 	static public function modFolders(key:String) {

@@ -173,46 +173,32 @@ class AttachedAchievement extends FlxSprite {
 		reloadAchievementImage(forceUnlock);
 	}
 
-	public function dotheCheckMod(tag:String) {
-		var gridID = Achievements.getAchievementIndex(tag);
-		#if MODS_ALLOWED
-			if (AchievementObject.checkModAwardStatic(tag))
-			{
-				var modsIconPath = Paths.modFolders('achievements/' + tag + '.png');
-				if(FileSystem.exists(modsIconPath)) {
-					loadGraphic(Paths.modFolders('achievements/' + tag + '.png'), true, 150, 150);
-				} else {
-					loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
-				}
-				gridID = 0;
-			} else {
-				loadGraphic(Paths.image('achievementgrid'), true, 150, 150);
-			}
-		#else
-			loadGraphic(Paths.image('achievementgrid'), true, 150, 150);
-		#end
-		animation.add('icon', [gridID], 0, false, false);
+	public function loadAwardIcon(tag:String) {
+		var modsIcon = Paths.award_icon(tag);
+		if(modsIcon != null) {
+			loadGraphic(Paths.award_icon(tag), true, 150, 150);
+		} else {
+			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
+		}
+
+		animation.add('icon', [0], 0, false, false);
 		animation.play('icon');
 	}
 
 	public function awardEditorImage(tag) {
-		#if MODS_ALLOWED
-		var modsIconPath = Paths.modFolders('achievements/' + tag + '.png');
-		if(FileSystem.exists(modsIconPath)) {
-			loadGraphic(Paths.modFolders('achievements/' + tag + '.png'), true, 150, 150);
+		var modsIcon = Paths.award_icon(tag);
+		if(modsIcon != null) {
+			loadGraphic(Paths.award_icon(tag), true, 150, 150);
 		} else {
 			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
 		}
-		#else
-			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
-		#end
 		animation.add('icon', [0], 0, false, false);
 		animation.play('icon');
 	}
 
 	public function reloadAchievementImage(forceUnlock) {
 		if(Achievements.isAchievementUnlocked(tag) || forceUnlock) {
-			if (!forceUnlock) dotheCheckMod(tag); else awardEditorImage(tag);
+			if (!forceUnlock) loadAwardIcon(tag); else awardEditorImage(tag);
 		} else {
 			loadGraphic(Paths.image('lockedachievement'));
 		}
@@ -243,44 +229,13 @@ class AchievementObject extends FlxSpriteGroup {
 
 		var awardName = Achievements.achievementsStuff[id][0];
 		var awardDesc = Achievements.achievementsStuff[id][1];
-		//i think this is gonna be unneccessarily stupid
-		#if MODS_ALLOWED
-		if (checkModAward(name))
-		{
-			var moddyFile:String = Paths.modFolders('achievements/' + name + '.json');
-			var awardJson = null;
-			if(FileSystem.exists(moddyFile))
-			{
-				awardJson = File.getContent(moddyFile).trim();
-				while (!awardJson.endsWith("}"))
-				{
-					awardJson = awardJson.substr(0, awardJson.length - 1);
-					// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
-				}
-				var stuff:CustomAward = null;
-				stuff = cast Json.parse(awardJson);
-				awardName = stuff.name;
-				awardDesc = stuff.description;
-			}
-			id = 0;
-		}
-		#end
 		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10);
-		#if MODS_ALLOWED
-		if (checkModAward(name))
-		{
-			var modsIconPath = Paths.modFolders('achievements/' + name + '.png');
-			if(FileSystem.exists(modsIconPath)) {
-				achievementIcon.loadGraphic(Paths.modFolders('achievements/' + name + '.png'), true, 150, 150);
-			} else {
-				achievementIcon.loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
-			}
+		var icon = Paths.award_icon(name);
+		if(icon != null) {
+			loadGraphic(Paths.award_icon(name), true, 150, 150);
 		} else {
-			achievementIcon.loadGraphic(Paths.image('achievementgrid'), true, 150, 150);
+			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
 		}
-		#else
-		achievementIcon.loadGraphic(Paths.image('achievementgrid'), true, 150, 150);
-		#end
 		achievementIcon.animation.add('icon', [id], 0, false, false);
 		achievementIcon.animation.play('icon');
 		achievementIcon.scrollFactor.set();
@@ -320,40 +275,6 @@ class AchievementObject extends FlxSpriteGroup {
 				}
 			});
 		}});
-	}
-
-	public function checkModAward(aName:String)
-	{
-		var isMod = false;
-		#if MODS_ALLOWED
-		var awardListPath = Paths.modFolders('achievements/awardsList.txt');
-		if (FileSystem.exists(awardListPath))
-		{
-			var awards = CoolUtil.coolTextFile(awardListPath);
-			if (awards.contains(aName))
-			{
-				isMod = true;
-			}
-		}
-		#end
-		return isMod;
-	}
-
-	static public function checkModAwardStatic(aName:String)
-	{
-		var isMod = false;
-		#if MODS_ALLOWED
-		var awardListPath = Paths.modFolders('achievements/awardsList.txt');
-		if (FileSystem.exists(awardListPath))
-		{
-			var awards = CoolUtil.coolTextFile(awardListPath);
-			if (awards.contains(aName))
-			{
-				isMod = true;
-			}
-		}
-		#end
-		return isMod;
 	}
 
 	override function destroy() {
