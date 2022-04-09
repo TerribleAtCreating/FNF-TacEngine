@@ -746,7 +746,7 @@ class PlayState extends MusicBeatState
 		}
 
 		var gMode = CoolUtil.gameplayModes[storyGMode].toLowerCase();
-		var scrPath = Paths.mode_script(gMode)
+		var scrPath = Paths.mode_script(gMode);
 		if(gMode != CoolUtil.nothingGMode.toLowerCase() && scrPath != null)
 		{
 			luaArray.push(new FunkinLua(scrPath));
