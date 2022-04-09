@@ -490,6 +490,7 @@ class FunkinLua {
 			if(strumnote != null) {
 				return Reflect.getProperty(strumnote, variable);
 			}
+			return null;
 		});
 		Lua_helper.add_callback(lua, "mouseClicked", function(button:String) {
 			var click = FlxG.mouse.justPressed;
