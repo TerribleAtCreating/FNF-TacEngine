@@ -729,6 +729,7 @@ class PlayState extends MusicBeatState
 			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/scripts/'));
 		#end
 
+		// GAMEPLAY MODE SCRIPTS
 		for (folder in foldersToCheck)
 		{
 			if(FileSystem.exists(folder))

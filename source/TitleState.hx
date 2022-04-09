@@ -46,7 +46,10 @@ typedef TitleData =
 	gfx:Float,
 	gfy:Float,
 	backgroundSprite:String,
-	bpm:Int
+	bpm:Int,
+	xmlName:String,
+	leftIndices:Array<Int>,
+	rightIndices:Array<Int>
 }
 class TitleState extends MusicBeatState
 {
@@ -306,8 +309,8 @@ class TitleState extends MusicBeatState
 		
 		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
 		#end
-			gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-			gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+			gfDance.animation.addByIndices('danceLeft', titleJSON.xmlName, titleJSON.leftIndices, "", 24, false);
+			gfDance.animation.addByIndices('danceRight', titleJSON.xmlName, titleJSON.rightIndices, "", 24, false);
 	
 		gfDance.antialiasing = ClientPrefs.globalAntialiasing;
 		add(gfDance);
