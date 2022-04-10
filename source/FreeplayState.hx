@@ -1,5 +1,6 @@
 package;
 
+import flixel.tweens.FlxEase;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -12,6 +13,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
+import flixel.util.FlxTimer;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
 import lime.utils.Assets;
@@ -302,6 +304,14 @@ class FreeplayState extends MusicBeatState
 
 		else if (accepted)
 		{
+			FlxG.sound.play(Paths.sound('confirmMenu'));
+			for (i in 0...grpSongs.length)
+			{
+				if (i != curSelected)
+				{
+					FlxTween.tween(grpSongs.members[i], {xAdd: -1000}, 0.5, {ease: FlxEase.sineInOut});
+				}
+			}
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			/*#if MODS_ALLOWED
@@ -325,15 +335,17 @@ class FreeplayState extends MusicBeatState
 				colorTween.cancel();
 			}
 			
-			if (FlxG.keys.pressed.SHIFT){
-				FlxG.switchState(new ChartingState());
-			}else{
-				LoadingState.loadAndSwitchState(new PlayState());
-			}
-
-			FlxG.sound.music.volume = 0;
-					
-			destroyFreeplayVocals();
+			new FlxTimer().start(1, function(tmr:FlxTimer)
+			{
+				if (FlxG.keys.pressed.SHIFT){
+					FlxG.switchState(new ChartingState());
+				}else{
+					LoadingState.loadAndSwitchState(new PlayState());
+				}
+	
+				FlxG.sound.music.volume = 0;
+				destroyFreeplayVocals();
+			});
 		}
 		else if(controls.RESET)
 		{

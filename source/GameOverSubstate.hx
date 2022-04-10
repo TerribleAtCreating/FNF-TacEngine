@@ -136,6 +136,14 @@ class GameOverSubstate extends MusicBeatSubstate
 	function coolStartDeath(?volume:Float = 1):Void
 	{
 		FlxG.sound.playMusic(Paths.music(loopSoundName), volume);
+		if (PlayState.curStage == "tank")
+		{
+			var originVolume = FlxG.sound.music.volume;
+			FlxG.sound.music.volume = 0.2;
+			FlxG.sound.play(Paths.soundRandom('jeffGameover/jeffGameover-', 1, 25, 'week7'), false, function() {
+				FlxG.sound.music.volume = originVolume;
+			});
+		}
 	}
 
 	function endBullshit():Void

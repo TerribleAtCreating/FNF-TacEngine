@@ -1,81 +1,92 @@
 {
 	"animations": [
 		{
+			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"loop": false,
-			"fps": 30,
 			"anim": "idle",
-			"indices": [],
-			"name": "Tankman Idle Dance"
+			"fps": 30,
+			"name": "Tankman Idle Dance",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				78,
 				-92
 			],
-			"loop": false,
-			"fps": 30,
 			"anim": "singDOWN",
-			"indices": [],
-			"name": "Tankman DOWN note"
+			"fps": 30,
+			"name": "Tankman DOWN note",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				80,
 				-7
 			],
-			"loop": false,
-			"fps": 30,
 			"anim": "singLEFT",
-			"indices": [],
-			"name": "Tankman Right Note"
+			"fps": 30,
+			"name": "Tankman Right Note",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				0,
 				-22
 			],
-			"loop": false,
-			"fps": 30,
 			"anim": "singRIGHT",
-			"indices": [],
-			"name": "Tankman Note Left"
+			"fps": 30,
+			"name": "Tankman Note Left",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				-15,
 				-14
 			],
-			"loop": false,
-			"fps": 26,
 			"anim": "singUP-alt",
-			"indices": [],
-			"name": "TANKMAN UGH"
+			"fps": 26,
+			"name": "TANKMAN UGH",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				43,
 				46
 			],
-			"loop": false,
-			"fps": 30,
 			"anim": "singUP",
-			"indices": [],
-			"name": "Tankman UP"
+			"fps": 30,
+			"name": "Tankman UP",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				0,
 				15
 			],
-			"loop": false,
-			"fps": 25,
 			"anim": "singDOWN-alt",
+			"fps": 25,
+			"name": "PRETTY GOOD tankman",
+			"indices": []
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
 			"indices": [],
-			"name": "PRETTY GOOD tankman"
+			"fps": 24,
+			"anim": "HPG",
+			"loop": false,
+			"name": "PRETTY GOOD tankman instance 1"
 		}
 	],
 	"no_antialiasing": false,

@@ -227,6 +227,20 @@ class PlayState extends MusicBeatState
 	var wiggleShit:WiggleEffect = new WiggleEffect();
 	var bgGhouls:BGSprite;
 
+	//week 7
+	var tankX = 0; //why is this here? idk
+	var tankSpeed = FlxG.random.float(5, 7);
+	var tankAngle = FlxG.random.float(-90, 45);
+	var tankWatchtower:BGSprite;
+
+	var tankRolling:BGSprite;
+	var tank0:BGSprite;
+	var tank1:BGSprite;
+	var tank2:BGSprite;
+	var tank3:BGSprite;
+	var tank4:BGSprite;
+	var tank5:BGSprite;
+
 	public var songScore:Int = 0;
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
@@ -372,6 +386,8 @@ class PlayState extends MusicBeatState
 					curStage = 'school';
 				case 'thorns':
 					curStage = 'schoolEvil';
+				case 'ugh' | 'guns':
+					curStage = 'tank';
 				default:
 					curStage = 'stage';
 			}
@@ -676,10 +692,61 @@ class PlayState extends MusicBeatState
 					bg.antialiasing = false;
 					add(bg);
 				}
-			case 'tank': //Week 7: Ugh, Guns
+			case 'tank': //Week 7: Ugh, Guns, Stress
 				var tankSky = new BGSprite('tankSky', -400, -400, 0, 0);
 
+				var tankBuildings = new BGSprite('tankBuildings', -200, -0, 0.3, 0.3);
+				tankBuildings.scale.set(1.1, 1.1);
+
+				var tankRuins = new BGSprite('tankRuins', -200, -0, 0.35, 0.35);
+				tankRuins.scale.set(1.1, 1.1);
 				add(tankSky);
+
+				tankWatchtower = new BGSprite('tankWatchtower', 100, 50, 0.5, 0.5, ['watchtower'], false);
+				tankRolling = new BGSprite('tankRolling', 100, 50, 0.5, 0.5, ['BG tank w lighting'], true);
+
+				var tankGround = new BGSprite('tankGround', -420, -150);
+				tankGround.scale.set(1.15, 1.15);
+				
+				var tankClouds:BGSprite = null;
+				var tankMountains:BGSprite = null;
+				var smokeLeft:BGSprite = null;
+				var smokeRight:BGSprite = null;
+				if (!ClientPrefs.lowQuality)
+				{
+					tankClouds = new BGSprite('tankClouds', FlxG.random.int(-700, -100), FlxG.random.int(-20, 20), 0.1, 0.1);
+					tankClouds.velocity.x = FlxG.random.int(5, 15);
+
+					tankMountains = new BGSprite('tankMountains', -300, -20, 0.2, 0.2);
+					tankMountains.scale.set(1.2, 1.2);
+
+					smokeLeft = new BGSprite('smokeLeft', -200, -100, 0.4, 0.4, ['SmokeBlurLeft']);
+					smokeRight = new BGSprite('smokeRight', 1100, -100, 0.4, 0.4, ['SmokeRight']);
+				}
+
+				if (!ClientPrefs.lowQuality) add(tankClouds);
+				if (!ClientPrefs.lowQuality) add(tankMountains);
+				add(tankBuildings);
+				add(tankRuins);
+				if (!ClientPrefs.lowQuality) add(smokeLeft);
+				if (!ClientPrefs.lowQuality) add(smokeRight);
+				add(tankWatchtower);
+				add(tankRolling);
+				add(tankGround);
+
+				//foreground shit
+				tank0 = new BGSprite('tank0', -500, 650, 1.7, 1.5, ['fg']);
+				tank2 = new BGSprite('tank2', 450, 940, 1.5, 1.5, ['foreground']);
+				tank5 = new BGSprite('tank5', 1620, 700, 1.5, 1.5, ['fg']);
+				
+				if (!ClientPrefs.lowQuality)
+				{
+					tank1 = new BGSprite('tank1', -300, 750, 2.0, 0.2, ['fg']);
+					tank4 = new BGSprite('tank4', 1300, 900, 1.5, 1.5, ['fg']);
+					tank3 = new BGSprite('tank3', 1300, 1200, 3.5, 2.5, ['fg']);
+				}
+
+				moveTank(0);
 		}
 
 		if(isPixelStage) {
@@ -697,6 +764,16 @@ class PlayState extends MusicBeatState
 		
 		if(curStage == 'spooky') {
 			add(halloweenWhite);
+		}
+
+		if (curStage == 'tank')
+		{
+			add(tank0);
+			if (!ClientPrefs.lowQuality) add(tank1);
+			add(tank2);
+			if (!ClientPrefs.lowQuality) add(tank4);
+			add(tank5);
+			if (!ClientPrefs.lowQuality) add(tank3);
 		}
 
 		#if LUA_ALLOWED
@@ -2114,6 +2191,7 @@ class PlayState extends MusicBeatState
 		}*/
 
 		callOnLuas('onUpdate', [elapsed]);
+		if (curStage == 'tank') moveTank(elapsed);
 		#if windows
 		if (shaderSprite != null)
 		{
@@ -4162,6 +4240,17 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	function moveTank(elapsed:Float)
+	{
+		if (!inCutscene)
+		{
+			tankAngle = tankAngle + (elapsed * tankSpeed);
+			tankRolling.angle = tankAngle - 90 + 15;
+			tankRolling.x = tankX + (1500 * Math.cos(Math.PI / 180 * (1 * tankAngle + 180)));
+			tankRolling.y = 1300 + (1100 * Math.sin(Math.PI / 180 * (1 * tankAngle + 180)));
+		}
+	}
+
 	private var preventLuaRemove:Bool = false;
 	override function destroy() {
 		preventLuaRemove = true;
@@ -4326,6 +4415,17 @@ class PlayState extends MusicBeatState
 				{
 					trainCooldown = FlxG.random.int(-4, 0);
 					trainStart();
+				}
+			case "tank":
+				if (curBeat % 4 == 0)
+				{
+					tankWatchtower.dance();
+					tank0.dance();
+					tank1.dance();
+					tank2.dance();
+					tank3.dance();
+					tank4.dance();
+					tank5.dance();
 				}
 		}
 
