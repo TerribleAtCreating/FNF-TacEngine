@@ -30,7 +30,7 @@ class Achievements {
 		["Lady Killer",					"Beat Week 4 on Hard with no Misses.",				'week4_nomiss',			false],
 		["Missless Christmas",			"Beat Week 5 on Hard with no Misses.",				'week5_nomiss',			false],
 		["Highscore!!",					"Beat Week 6 on Hard with no Misses.",				'week6_nomiss',			false],
-		["You'll Pay For That...",		"Beat Week 7 on Hard with no Misses.",				'week7_nomiss',			 true],
+		["You'll Pay For That...",		"Beat Week 7 on Hard with no Misses.",				'week7_nomiss',			false],
 		["What a Funkin' Disaster!",	"Complete a Song with a rating lower than 20%.",	'ur_bad',				false],
 		["Perfectionist",				"Complete a Song with a rating of 100%.",			'ur_good',				false],
 		["Roadkill Enthusiast",			"Watch the Henchmen die over 100 times.",			'roadkill_enthusiast',	false],
@@ -236,7 +236,7 @@ class AchievementObject extends FlxSpriteGroup {
 		} else {
 			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
 		}
-		achievementIcon.animation.add('icon', [id], 0, false, false);
+		achievementIcon.animation.add('icon', [0], 0, false, false);
 		achievementIcon.animation.play('icon');
 		achievementIcon.scrollFactor.set();
 		achievementIcon.setGraphicSize(Std.int(achievementIcon.width * (2 / 3)));
