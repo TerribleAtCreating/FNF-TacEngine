@@ -2334,9 +2334,50 @@ class ChartingState extends MusicBeatState
 
 	private function saveLevel()
 	{
-		var json = {
-			"song": _song
+		var hitNotes:Array<SwagSection> = [];
+		for (sec in 0..._song.notes.length) {
+			if(_song.notes[sec] == null) continue;
+
+			var arrayNotes:Array<Dynamic> = [];
+			for (i in 0..._song.notes[sec].sectionNotes.length) {
+				var note:Array<Dynamic> = _song.notes[sec].sectionNotes[i];
+				if(note != null && note[1] > -1) {
+					arrayNotes.push(note);
+				}
+			}
+
+			var sex:SwagSection = {
+				sectionNotes: arrayNotes,
+				lengthInSteps: 16,
+				typeOfSection: 0,
+				mustHitSection: false,
+				gfSection: false,
+				bpm: 0,
+				changeBPM: false,
+				altAnim: false
+			};
+			hitNotes.push(sex);
+		}
+
+		var filteredSong:SwagSong = {
+			song: _song.song,
+			notes: hitNotes,
+			bpm: _song.bpm,
+			needsVoices: _song.needsVoices,
+			speed: _song.speed,
+			arrowSkin: _song.arrowSkin,
+			splashSkin: _song.splashSkin,
+
+			player1: _song.player1,
+			player2: _song.player2,
+			player3: _song.player3,
+			stage: _song.stage,
+			validScore: false,
+			extraText: _song.extraText
 		};
+		var json = {
+			"song": filteredSong
+		}
 
 		var data:String = Json.stringify(json, "\t");
 

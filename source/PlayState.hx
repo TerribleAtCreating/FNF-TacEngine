@@ -2191,6 +2191,13 @@ class PlayState extends MusicBeatState
 		}*/
 
 		callOnLuas('onUpdate', [elapsed]);
+		
+		var txtColor:FlxColor = FlxColor.WHITE;
+		if (healthBar.percent < 20) scoreTxt.color = FlxColor.RED;
+		else if (healthBar.percent > 80) scoreTxt.color = FlxColor.CYAN;
+
+		if (scoreTxt != null && scoreTxt.color != txtColor) FlxTween.tween(scoreTxt, {color: txtColor}, 0.75, {ease: FlxEase.linear});
+			
 		if (curStage == 'tank') moveTank(elapsed);
 		#if windows
 		if (shaderSprite != null)

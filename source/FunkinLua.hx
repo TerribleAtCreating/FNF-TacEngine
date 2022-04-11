@@ -604,13 +604,21 @@ class FunkinLua {
 		});*/
 		//playstate dot instance spam
 		Lua_helper.add_callback(lua, "changeHealthIcon", function(char:String = 'dad', name:String) {
-			if (char == 'dad')
-			{
-			PlayState.instance.iconP2.changeIcon(name);
-			} else if (char == 'bf')
-			{
-			PlayState.instance.iconP1.changeIcon(name);
-			}
+			if (char == 'dad') PlayState.instance.iconP2.changeIcon(name);
+			if (char == 'bf') PlayState.instance.iconP1.changeIcon(name);
+		});
+
+		Lua_helper.add_callback(lua, "changeHealthColor", function(char:String = 'dad', red:Int = 255, green:Int = 0, blue:Int = 0) {
+			if (Math.isNaN(red)) red = 255;
+			if (Math.isNaN(green)) green = 0;
+			if (Math.isNaN(blue)) blue = 0;
+			var color = [red%256, green%256, blue%256];
+			var dadColor = [PlayState.instance.dad.healthColorArray[0], PlayState.instance.dad.healthColorArray[1], PlayState.instance.dad.healthColorArray[2]];
+			var bfColor = [PlayState.instance.boyfriend.healthColorArray[0], PlayState.instance.boyfriend.healthColorArray[1], PlayState.instance.boyfriend.healthColorArray[2]];
+			if (char == 'dad') dadColor = color;
+			if (char == 'bf') bfColor = color;
+			PlayState.instance.healthBar.createFilledBar(FlxColor.fromRGB(dadColor[0], dadColor[1], dadColor[2]), FlxColor.fromRGB(bfColor[0], bfColor[1], bfColor[2]));
+			PlayState.instance.healthBar.updateBar();
 		});
 		//stupid bietch ass functions
 		Lua_helper.add_callback(lua, "addScore", function(value:Int = 0) {
