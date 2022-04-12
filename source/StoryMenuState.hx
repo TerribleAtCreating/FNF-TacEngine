@@ -543,7 +543,6 @@ class StoryMenuState extends MusicBeatState
 		{
 			CoolUtil.gameplayModes = modelist;
 		}
-		trace(CoolUtil.gameplayModes);
 		curDifficulty = Math.round(Math.max(0, CoolUtil.defaultDifficulties.indexOf(CoolUtil.defaultDifficulty)));
 		var newPos:Int = CoolUtil.difficulties.indexOf(lastDifficultyName);
 		//trace('Pos of ' + lastDifficultyName + ' is ' + newPos);

@@ -232,9 +232,9 @@ class AchievementObject extends FlxSpriteGroup {
 		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10);
 		var icon = Paths.award_icon(name);
 		if(icon != null) {
-			loadGraphic(Paths.award_icon(name), true, 150, 150);
+			achievementIcon.loadGraphic(Paths.award_icon(name), true, 150, 150);
 		} else {
-			loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
+			achievementIcon.loadGraphic(Paths.image('unknownMod', 'preload'), true, 150, 150);
 		}
 		achievementIcon.animation.add('icon', [0], 0, false, false);
 		achievementIcon.animation.play('icon');

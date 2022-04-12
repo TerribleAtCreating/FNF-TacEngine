@@ -379,6 +379,7 @@ class TitleState extends MusicBeatState
 			skipIntro();
 		else
 			initialized = true;
+		createCoolText(['L Engine by'], 15);
 
 		// credGroup.add(credTextShit);
 	}
@@ -554,7 +555,7 @@ class TitleState extends MusicBeatState
 		}
 	}
 
-	private var sickBeats:Int = 0; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
+	private var sickBeats:Int = 1; //Basically curBeat but won't be skipped if you hold the tab or resize the screen
 	public static var closedState:Bool = false;
 	override function beatHit()
 	{
@@ -576,13 +577,8 @@ class TitleState extends MusicBeatState
 			sickBeats++;
 			switch (sickBeats)
 			{
-				case 1:
-					createCoolText(['Psych Engine by'], 15);
-				// credTextShit.visible = true;
 				case 3:
-					addMoreText('Shadow Mario', 15);
-					addMoreText('RiverOaken', 15);
-					addMoreText('bb-panzu', 15);
+					addMoreText('TerribleAtCreating', 15);
 				// credTextShit.text += '\npresent...';
 				// credTextShit.addText();
 				case 4:
