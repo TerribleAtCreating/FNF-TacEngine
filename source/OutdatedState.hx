@@ -25,7 +25,7 @@ class OutdatedState extends MusicBeatState
 
 		warnText = new FlxText(0, 0, FlxG.width,
 			"Sup bro, looks like you're running an   \n
-			outdated version of L Engine (" + MainMenuState.lEngineVersion + "),\n
+			outdated version of L Engine (" + MainMenuState.tacEngineVersion + "),\n
 			please update to " + TitleState.updateVersion + "!\n
 			\n
 			Thank you for using the Engine!",

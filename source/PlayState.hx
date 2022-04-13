@@ -1136,7 +1136,7 @@ class PlayState extends MusicBeatState
 		+ CoolUtil.difficultyString()
 		+ " - "
 		+ CoolUtil.modeString()
-		+ " // L Engine v0.1", 16);
+		+ " // Tac Engine v0.1", 16);
 		//+ " ", 16);
 
 		songWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

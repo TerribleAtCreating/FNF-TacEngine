@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin': L Engine" file="LEngine" packageName="com.tac.lengine" package="com.tac.lengine" main="Main" version="0.2.7" company="TerribleAtCreating" />
+	<app title="Friday Night Funkin': Tac Engine" file="TacEngine" packageName="com.tac.tacengine" package="com.tac.tacengine" main="Main" version="0.2.7" company="TerribleAtCreating" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />

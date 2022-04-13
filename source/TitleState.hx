@@ -379,7 +379,7 @@ class TitleState extends MusicBeatState
 			skipIntro();
 		else
 			initialized = true;
-		createCoolText(['L Engine by'], 15);
+		createCoolText(['Tac Engine by'], 15);
 
 		// credGroup.add(credTextShit);
 	}
