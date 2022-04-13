@@ -1128,15 +1128,18 @@ class PlayState extends MusicBeatState
 			textYPos = healthBarBG.y + 30;
 		}
 		// totally didnt took this from KE (sorry)
-	if (!ClientPrefs.hideWatermark)
-		{
-		songWatermark = new FlxText(4, textYPos, 0,
-		SONG.song
+		var watermarkText = SONG.song
 		+ " "
 		+ CoolUtil.difficultyString()
 		+ " - "
 		+ CoolUtil.modeString()
-		+ " // Tac Engine v0.1", 16);
+		+ " // Tac Engine v0.1";
+		var luaWatermark:Dynamic = callOnLuas('onWatermarkCreation', []);
+		if (luaWatermark is String) watermarkText = luaWatermark;
+		trace(luaWatermark);
+	if (!ClientPrefs.hideWatermark)
+		{
+		songWatermark = new FlxText(4, textYPos, 0, watermarkText, 16);
 		//+ " ", 16);
 
 		songWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -4445,7 +4448,7 @@ class PlayState extends MusicBeatState
 		#if LUA_ALLOWED
 		for (i in 0...luaArray.length) {
 			var ret:Dynamic = luaArray[i].call(event, args);
-			if(ret != FunkinLua.Function_Continue) {
+			if(ret != FunkinLua.Function_Continue || ret is String) {
 				returnVal = ret;
 			}
 		}

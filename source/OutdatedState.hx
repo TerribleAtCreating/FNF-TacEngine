@@ -25,7 +25,7 @@ class OutdatedState extends MusicBeatState
 
 		warnText = new FlxText(0, 0, FlxG.width,
 			"Sup bro, looks like you're running an   \n
-			outdated version of L Engine (" + MainMenuState.tacEngineVersion + "),\n
+			outdated version of Tac Engine (" + MainMenuState.tacEngineVersion + "),\n
 			please update to " + TitleState.updateVersion + "!\n
 			\n
 			Thank you for using the Engine!",
@@ -40,7 +40,7 @@ class OutdatedState extends MusicBeatState
 		if(!leftState) {
 			if (controls.ACCEPT || controls.BACK) {
 				leftState = true;
-				CoolUtil.browserLoad("https://github.com/ShadowMario/FNF-PsychEngine/releases");
+				CoolUtil.browserLoad("https://github.com/MlLulu/FNF-TacEngine/releases");
 				FlxG.sound.play(Paths.sound('cancelMenu'));
 				FlxTween.tween(warnText, {alpha: 0}, 1, {
 					onComplete: function (twn:FlxTween) {
