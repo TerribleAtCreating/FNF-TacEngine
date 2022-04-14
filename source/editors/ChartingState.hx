@@ -211,6 +211,7 @@ class ChartingState extends MusicBeatState
 			addSection();
 			PlayState.SONG = _song;
 		}
+		PlayState.activateChartingMode();
 		#if MODS_ALLOWED
 		Paths.destroyLoadedImages();
 		#end
@@ -2346,17 +2347,9 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			var sex:SwagSection = {
-				sectionNotes: arrayNotes,
-				lengthInSteps: 16,
-				typeOfSection: 0,
-				mustHitSection: false,
-				gfSection: false,
-				bpm: 0,
-				changeBPM: false,
-				altAnim: false
-			};
-			hitNotes.push(sex);
+			var section:SwagSection = _song.notes[sec];
+			section.sectionNotes = arrayNotes;
+			hitNotes.push(section);
 		}
 
 		var filteredSong:SwagSong = {

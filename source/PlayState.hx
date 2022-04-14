@@ -116,6 +116,7 @@ class PlayState extends MusicBeatState
 	public static var isPixelStage:Bool = false;
 	public static var SONG:SwagSong = null;
 	public static var isStoryMode:Bool = false;
+	public static var chartingMode = false;
 	public static var storyWeek:Int = 0;
 	public static var storyPlaylist:Array<String> = [];
 	public static var storyDifficulty:Int = 1;
@@ -1136,8 +1137,7 @@ class PlayState extends MusicBeatState
 		+ " // Tac Engine v0.1";
 		var luaWatermark:Dynamic = callOnLuas('onWatermarkCreation', []);
 		if (luaWatermark is String) watermarkText = luaWatermark;
-		trace(luaWatermark);
-	if (!ClientPrefs.hideWatermark)
+		if (!ClientPrefs.hideWatermark)
 		{
 		songWatermark = new FlxText(4, textYPos, 0, watermarkText, 16);
 		//+ " ", 16);
@@ -2204,6 +2204,8 @@ class PlayState extends MusicBeatState
 			shad.uTime.value[0] += elapsed;
 		}
 		#end
+
+		botplayTxt.visible = cpuControlled;
 		switch (curStage)
 		{
 			case 'schoolEvil':
@@ -2336,6 +2338,7 @@ class PlayState extends MusicBeatState
 		} else {
 			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
 		}
+		if (chartingMode) scoreTxt.text += ' (CHARTING MODE)';
 
 		if(botplayTxt.visible) {
 			botplaySine += 180 * elapsed;
@@ -2650,46 +2653,17 @@ class PlayState extends MusicBeatState
 			}
 		}
 		
-		#if debug
-		if(!endingSong && !startingSong) {
-			if (FlxG.keys.justPressed.ONE) {
-				KillNotes();
-				FlxG.sound.music.onComplete();
-			}
-			if(FlxG.keys.justPressed.TWO) { //Go 10 seconds into the future :O
-				FlxG.sound.music.pause();
-				vocals.pause();
-				Conductor.songPosition += 10000;
-				notes.forEachAlive(function(daNote:Note)
-				{
-					if(daNote.strumTime + 800 < Conductor.songPosition) {
-						daNote.active = false;
-						daNote.visible = false;
-
-						daNote.kill();
-						notes.remove(daNote, true);
-						daNote.destroy();
-					}
-				});
-				for (i in 0...unspawnNotes.length) {
-					var daNote:Note = unspawnNotes[0];
-					if(daNote.strumTime + 800 >= Conductor.songPosition) {
-						break;
-					}
-
-					daNote.active = false;
-					daNote.visible = false;
-
-					daNote.kill();
-					unspawnNotes.splice(unspawnNotes.indexOf(daNote), 1);
-					daNote.destroy();
+		if (chartingMode)
+		{
+			if(!endingSong && !startingSong) {
+				if (FlxG.keys.justPressed.ONE) {
+					KillNotes();
+					FlxG.sound.music.onComplete();
 				}
-
-				FlxG.sound.music.time = Conductor.songPosition;
-				FlxG.sound.music.play();
-
-				vocals.time = Conductor.songPosition;
-				vocals.play();
+				if(FlxG.keys.justPressed.TWO) { //Go 10 seconds into the future :O
+					setSongTime(Conductor.songPosition + 10000);
+					clearNotesBefore(Conductor.songPosition);
+				}
 			}
 		}
 
@@ -2697,7 +2671,56 @@ class PlayState extends MusicBeatState
 		setOnLuas('cameraY', camFollowPos.y);
 		setOnLuas('botPlay', cpuControlled);
 		callOnLuas('onUpdatePost', [elapsed]);
-		#end
+	}
+
+	public function setSongTime(time:Float)
+	{
+		if(time < 0) time = 0;
+
+		FlxG.sound.music.pause();
+		vocals.pause();
+
+		FlxG.sound.music.time = time;
+		FlxG.sound.music.play();
+
+		vocals.time = time;
+		vocals.play();
+		Conductor.songPosition = time;
+	}
+
+	public function clearNotesBefore(time:Float)
+	{
+		var i:Int = unspawnNotes.length - 1;
+		while (i >= 0) {
+			var daNote:Note = unspawnNotes[i];
+			if(daNote.strumTime - 500 < time)
+			{
+				daNote.active = false;
+				daNote.visible = false;
+				daNote.ignoreNote = true;
+
+				daNote.kill();
+				unspawnNotes.remove(daNote);
+				daNote.destroy();
+			}
+			--i;
+		}
+
+		i = notes.length - 1;
+		while (i >= 0) {
+			var daNote:Note = notes.members[i];
+			if(daNote.strumTime - 500 < time)
+			{
+				daNote.active = false;
+				daNote.visible = false;
+				daNote.ignoreNote = true;
+
+				daNote.kill();
+				notes.remove(daNote, true);
+				daNote.destroy();
+			}
+			--i;
+		}
 	}
 
 	public var isDead:Bool = false; //Don't mess with this on Lua!!!
@@ -3244,6 +3267,17 @@ class PlayState extends MusicBeatState
 			if(doDeathCheck()) {
 				return;
 			}
+		}
+
+		if (chartingMode)
+		{
+			CustomFadeTransition.nextCamera = camOther;
+			if(FlxTransitionableState.skipNextTransIn) {
+				CustomFadeTransition.nextCamera = null;
+			}
+			MusicBeatState.resetState();
+			FlxG.sound.music.volume = 0;
+			return;
 		}
 		
 		timeBarBG.visible = false;
@@ -4284,6 +4318,11 @@ class PlayState extends MusicBeatState
 		if(luaArray != null && !preventLuaRemove) {
 			luaArray.remove(lua);
 		}
+	}
+
+	public static function activateChartingMode()
+	{
+		chartingMode = true;
 	}
 
 	var lastStepHit:Int = -1;
