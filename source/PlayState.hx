@@ -155,6 +155,7 @@ class PlayState extends MusicBeatState
 
 	public var gfSpeed:Int = 1;
 	public var health:Float = 1;
+	public var isDead:Bool = false; //Don't mess with this on Lua!!!
 	public var combo:Int = 0;
 
 	private var healthBarBG:AttachedSprite;
@@ -1153,6 +1154,18 @@ class PlayState extends MusicBeatState
 		add(creditsWatermark);
 		creditsWatermark.cameras = [camHUD];
 	}
+		if (chartingMode)
+		{
+			var chartTextArray:Array<String> = ['ONE - End Song', 'TWO - Warp forward 10s', 'THREE - Replenish Health'];
+			for (i in 0...chartTextArray.length)
+			{
+				var chartModeGuide = new FlxText(FlxG.width - 250, healthBarBG.y + 50 + i*30, 0, chartTextArray[i], 16);
+				chartModeGuide.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				chartModeGuide.scrollFactor.set();
+				chartModeGuide.cameras = [camHUD];
+				add(chartModeGuide);
+			}
+		}
 
 		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
 		botplayTxt.setFormat(Paths.font("comic-sans.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -2332,11 +2345,14 @@ class PlayState extends MusicBeatState
 		}
 
 		super.update(elapsed);
+		//prefix for score text
+		var prefixStuff:String = '';
+		if (isDead) prefixStuff += 'INVINCIBLE | ';
 
 		if(ratingName == '?') {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName;
+			scoreTxt.text = prefixStuff + 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName;
 		} else {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
+			scoreTxt.text = prefixStuff + 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
 		}
 		if (chartingMode) scoreTxt.text += ' (CHARTING MODE)';
 
@@ -2657,12 +2673,15 @@ class PlayState extends MusicBeatState
 		{
 			if(!endingSong && !startingSong) {
 				if (FlxG.keys.justPressed.ONE) {
-					KillNotes();
+					killNotes();
 					FlxG.sound.music.onComplete();
 				}
 				if(FlxG.keys.justPressed.TWO) { //Go 10 seconds into the future :O
 					setSongTime(Conductor.songPosition + 10000);
 					clearNotesBefore(Conductor.songPosition);
+				}
+				if(FlxG.keys.justPressed.THREE) { //Get health :D
+					health = 2;
 				}
 			}
 		}
@@ -2722,8 +2741,6 @@ class PlayState extends MusicBeatState
 			--i;
 		}
 	}
-
-	public var isDead:Bool = false; //Don't mess with this on Lua!!!
 	function doDeathCheck(?skipHealthCheck:Bool = false) {
 		if (((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead)
 		{
@@ -3335,7 +3352,7 @@ class PlayState extends MusicBeatState
 				Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
 				#end
 			}
-
+			chartingMode = false;
 			if (isStoryMode)
 			{
 				campaignScore += songScore;
@@ -3440,7 +3457,7 @@ class PlayState extends MusicBeatState
 	}
 	#end
 
-	public function KillNotes() {
+	public function killNotes() {
 		while(notes.length > 0) {
 			var daNote:Note = notes.members[0];
 			daNote.active = false;
@@ -4323,6 +4340,11 @@ class PlayState extends MusicBeatState
 	public static function activateChartingMode()
 	{
 		chartingMode = true;
+	}
+
+	public static function disableChartingMode()
+	{
+		chartingMode = false;
 	}
 
 	var lastStepHit:Int = -1;

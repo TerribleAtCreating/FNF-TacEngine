@@ -309,7 +309,8 @@ class FreeplayState extends MusicBeatState
 			{
 				if (i != curSelected)
 				{
-					FlxTween.tween(grpSongs.members[i], {xAdd: -1000}, 0.5, {ease: FlxEase.sineInOut});
+					var xAddVal = 500 + grpSongs.members[i].width;
+					FlxTween.tween(grpSongs.members[i], {xAdd: -xAddVal}, 0.5, {ease: FlxEase.sineInOut});
 				}
 			}
 			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);

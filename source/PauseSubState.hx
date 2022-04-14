@@ -193,6 +193,7 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.cpuControlled = !PlayState.instance.cpuControlled;
 					botplayText.visible = PlayState.instance.cpuControlled;
 				case "Exit to menu":
+					PlayState.chartingMode = false;
 					PlayState.deathCounter = 0;
 					PlayState.seenCutscene = false;
 					CustomFadeTransition.nextCamera = transCamera;
