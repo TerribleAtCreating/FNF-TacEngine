@@ -9,7 +9,6 @@ import flixel.FlxSprite;
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
-import flixel.graphics.FlxGraphic;
 import openfl.display.BitmapData;
 #end
 
@@ -207,23 +206,11 @@ class Paths
 	}
 	#end
 
-	inline static public function image(key:String, ?library:String):Dynamic
+	inline static public function image(key:String, ?library:String):FlxGraphic
 	{
-		#if MODS_ALLOWED
-		var imageToReturn:FlxGraphic = addCustomGraphic(key);
-		/*
-		//SHADOWMARIO TEST THIS IM NOT AT HOME RN.
-
-		//k so for sum reason even when a current mod is loaded, it will only pull from the graphics key shit : (((
-		//so i made it test if one exists in the mod folder or the mod directories.
-		var pathshit = modsImages(key)
-		if (FileSystem.exists(path)){
-			imageToReturn = BitmapData.fromFile(path);
-		}
-		*/
-		if(imageToReturn != null) return imageToReturn;
-		#end
-		return getPath('images/$key.png', IMAGE, library);
+		// streamlined the assets process more
+		var returnAsset:FlxGraphic = returnGraphic(key, library);
+		return returnAsset;
 	}
 
 	inline static public function award_icon(key:String):Dynamic
@@ -348,6 +335,35 @@ class Paths
 	}
 	public static var localTrackedAssets:Array<String> = [];
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
+
+	public static function returnGraphic(key:String, ?library:String) {
+		#if MODS_ALLOWED
+		var modKey:String = modsImages(key);
+		if(FileSystem.exists(modKey)) {
+			if(!currentTrackedAssets.exists(modKey)) {
+				var newBitmap:BitmapData = BitmapData.fromFile(modKey);
+				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(newBitmap, false, modKey);
+				newGraphic.persist = true;
+				currentTrackedAssets.set(modKey, newGraphic);
+			}
+			localTrackedAssets.push(modKey);
+			return currentTrackedAssets.get(modKey);
+		}
+		#end
+
+		var path = getPath('images/$key.png', IMAGE, library);
+		if (OpenFlAssets.exists(path, IMAGE)) {
+			if(!currentTrackedAssets.exists(path)) {
+				var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
+				newGraphic.persist = true;
+				currentTrackedAssets.set(path, newGraphic);
+			}
+			localTrackedAssets.push(path);
+			return currentTrackedAssets.get(path);
+		}
+		trace('oh no its returning null NOOOO');
+		return null;
+	}
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];
 	public static function returnSound(path:String, key:String, ?library:String) {

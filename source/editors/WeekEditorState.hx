@@ -20,6 +20,7 @@ import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.addons.ui.FlxUINumericStepper;
 import flixel.addons.ui.FlxUITabMenu;
+import flixel.graphics.FlxGraphic;
 import flixel.ui.FlxButton;
 import openfl.net.FileReference;
 import openfl.events.Event;
@@ -319,9 +320,9 @@ class WeekEditorState extends MusicBeatState
 
 		var isMissing:Bool = true;
 		if(assetName != null && assetName.length > 0) {
-			if( #if MODS_ALLOWED FileSystem.exists(Paths.modsImages('menubackgrounds/menu_' + assetName)) || #end
-			Assets.exists(Paths.image('menubackgrounds/menu_' + assetName), IMAGE)) {
-				bgSprite.loadGraphic(Paths.image('menubackgrounds/menu_' + assetName));
+			var bgGraphic = Paths.image('menubackgrounds/menu_' + assetName);
+			if(bgGraphic is FlxGraphic) {
+				bgSprite.loadGraphic(bgGraphic);
 				isMissing = false;
 			}
 		}
@@ -338,9 +339,9 @@ class WeekEditorState extends MusicBeatState
 		
 		var isMissing:Bool = true;
 		if(assetName != null && assetName.length > 0) {
-			if(#if MODS_ALLOWED FileSystem.exists(Paths.modsImages('storymenu/' + assetName)) || #end
-			Assets.exists(Paths.image('storymenu/' + assetName), IMAGE)) {
-				weekThing.loadGraphic(Paths.image('storymenu/' + assetName));
+			var weekGraphic = Paths.image('storymenu/' + assetName);
+			if(weekGraphic is FlxGraphic) {
+				weekThing.loadGraphic(weekGraphic);
 				isMissing = false;
 			}
 		}

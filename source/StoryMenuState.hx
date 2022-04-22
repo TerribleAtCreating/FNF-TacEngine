@@ -373,7 +373,8 @@ class StoryMenuState extends MusicBeatState
 
 	var tweenDifficulty:FlxTween;
 	var tweenMode:FlxTween;
-	var lastImagePath:String;
+	var lastImageD:FlxGraphic;
+	var lastImageM:FlxGraphic;
 	function changeDifficulty(change:Int = 0):Void
 	{
 		curDifficulty += change;
@@ -384,16 +385,8 @@ class StoryMenuState extends MusicBeatState
 			curDifficulty = 0;
 
 		var image:Dynamic = Paths.image('menudifficulties/' + Paths.formatToSongPath(CoolUtil.difficulties[curDifficulty]));
-		var newImagePath:String = '';
-		if(image is FlxGraphic)
-		{
-			var graphic:FlxGraphic = image;
-			newImagePath = graphic.assetsKey;
-		}
-		else
-			newImagePath = image;
 
-		if(newImagePath != lastImagePath)
+		if(image != lastImageD)
 		{
 			sprDifficulty.loadGraphic(image);
 			sprDifficulty.x = leftArrow.x + 60;
@@ -407,7 +400,7 @@ class StoryMenuState extends MusicBeatState
 				tweenDifficulty = null;
 			}});
 		}
-		lastImagePath = newImagePath;
+		lastImageD = image;
 		lastDifficultyName = CoolUtil.difficulties[curDifficulty];
 		lastModeName = CoolUtil.gameplayModes[curMode];
 
@@ -427,16 +420,8 @@ class StoryMenuState extends MusicBeatState
 				curMode = 0;
 	
 			var image:Dynamic = Paths.image('gameplaymodes/' + Paths.formatToSongPath(CoolUtil.gameplayModes[curMode]));
-			var newImagePath:String = '';
-			if(image is FlxGraphic)
-			{
-				var graphic:FlxGraphic = image;
-				newImagePath = graphic.assetsKey;
-			}
-			else
-				newImagePath = image;
 	
-			if(newImagePath != lastImagePath)
+			if(image != lastImageM)
 			{
 				sprMode.loadGraphic(image);
 				sprMode.x = leftArrowALT.x + 60;
@@ -450,7 +435,7 @@ class StoryMenuState extends MusicBeatState
 					tweenMode = null;
 				}});
 			}
-			lastImagePath = newImagePath;
+			lastImageM = image;
 			lastDifficultyName = CoolUtil.difficulties[curDifficulty];
 			lastModeName = CoolUtil.gameplayModes[curMode];
 	
