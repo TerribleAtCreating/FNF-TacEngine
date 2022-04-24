@@ -354,9 +354,9 @@ class FreeplayState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('scrollMenu'));
 		}
 		else if(ctrl)
-			{
-			 openSubState(new GameplayChangersSubstate());
-			}
+		{
+			openSubState(new GameplayChangersSubstate());
+		}
 		super.update(elapsed);
 	}
 

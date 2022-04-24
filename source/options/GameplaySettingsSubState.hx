@@ -63,6 +63,13 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
+		var option:Option = new Option('Antimash',
+			"If checked, spamming will result in misses coming out of nowhere.",
+			'antimash',
+			'bool',
+			true);
+		addOption(option);
+
 		var option:Option = new Option('Pussy Input',
 			"If checked, you only need to hold instead of pressing.\nAlso classifies you as a pussy. Pussies do not get saved scores.",
 			'pussyInput',
