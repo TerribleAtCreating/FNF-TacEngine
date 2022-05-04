@@ -1,1 +1,1 @@
-Pout your .lua scripts for gameplay modes here!
+Put your .lua scripts for gameplay modes here!

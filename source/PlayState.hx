@@ -2511,7 +2511,7 @@ class PlayState extends MusicBeatState
 			var time:Float = 1500;
 			if(roundedSpeed < 1) time /= roundedSpeed;
 
-			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
+			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time && notes.length < 50)
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				notes.add(dunceNote);
@@ -3484,9 +3484,10 @@ class PlayState extends MusicBeatState
 		var placement:String = Std.string(combo);
 
 		var coolText:FlxText = new FlxText(0, 0, 0, placement, 32);
+		coolText.cameras = [camHUD];
 		coolText.screenCenter();
-		coolText.x = FlxG.width * 0.35;
-		//
+		coolText.x += ClientPrefs.comboOffset[0];
+		coolText.y -= ClientPrefs.comboOffset[1];
 
 		var rating:FlxSprite = new FlxSprite();
 		var score:Int = 350;
@@ -3636,6 +3637,7 @@ class PlayState extends MusicBeatState
 
 			if (combo >= 10 || combo == 0)
 				insert(members.indexOf(strumLineNotes), numScore);
+				insert(members.indexOf(strumLineNotes), comboSpr);
 
 			FlxTween.tween(numScore, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
@@ -4033,7 +4035,7 @@ class PlayState extends MusicBeatState
 				return;
 			}
 
-			if (!note.isSustainNote)
+			if (!note.isSustainNote && !cpuControlled)
 			{
 				combo += 1;
 				popUpScore(note);
