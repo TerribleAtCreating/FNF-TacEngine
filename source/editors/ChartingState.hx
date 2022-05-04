@@ -2398,7 +2398,7 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			var sex:SwagSection = {
+			var esection:SwagSection = {
 				sectionNotes: arrayNotes,
 				lengthInSteps: 16,
 				typeOfSection: 0,
@@ -2408,7 +2408,7 @@ class ChartingState extends MusicBeatState
 				changeBPM: false,
 				altAnim: false
 			};
-			events.push(sex);
+			events.push(esection);
 		}
 
 		var eventsSong:SwagSong = {

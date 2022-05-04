@@ -807,8 +807,6 @@ class PlayState extends MusicBeatState
 		if(Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
 			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/scripts/'));
 		#end
-
-		// GAMEPLAY MODE SCRIPTS
 		for (folder in foldersToCheck)
 		{
 			if(FileSystem.exists(folder))
@@ -824,6 +822,7 @@ class PlayState extends MusicBeatState
 			}
 		}
 
+		//GAMEPLAY MODE SCRIPTS
 		var gMode = CoolUtil.gameplayModes[storyGMode].toLowerCase();
 		var scrPath = Paths.mode_script(gMode);
 		if(gMode != CoolUtil.nothingGMode.toLowerCase() && scrPath != null)
@@ -3704,7 +3703,7 @@ class PlayState extends MusicBeatState
 							sortedNotesList.push(daNote);
 							//notesDatas.push(daNote.noteData);
 						}
-						canMiss = true;
+						if (ClientPrefs.antimash) canMiss = true;
 					}
 				});
 				sortedNotesList.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
