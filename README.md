@@ -17,7 +17,7 @@ To install LuaJIT do this: `haxelib install linc_luajit` on a Command prompt/Pow
 * RiverOaken - Arts and Animations
 * bbpanzu - Assistant Coding
 
-### L Engine:
+### Tac Engine:
 * TerribleAtCreating - Did literally everything
 
 
