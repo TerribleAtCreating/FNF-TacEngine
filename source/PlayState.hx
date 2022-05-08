@@ -156,6 +156,7 @@ class PlayState extends MusicBeatState
 	public var gfSpeed:Int = 1;
 	public var health:Float = 1;
 	public var isDead:Bool = false; //Don't mess with this on Lua!!!
+	public var gameOverDone:Bool = false; //Don't mess with this on Lua either!!!
 	public var combo:Int = 0;
 
 	private var healthBarBG:AttachedSprite;
@@ -945,7 +946,7 @@ class PlayState extends MusicBeatState
 
 		var showTime:Bool = (ClientPrefs.timeBarType != 'Disabled');
 		timeTxt = new FlxText(STRUM_X + (FlxG.width / 2) - 248, 19, 400, "", 32);
-		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeTxt.setFormat(Paths.font("alphabet.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
 		timeTxt.borderSize = 2;
@@ -1101,14 +1102,14 @@ class PlayState extends MusicBeatState
 		reloadHealthBarColors();
 
 		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 18);
-		scoreTxt.setFormat(Paths.font("comic-sans.ttf"), 18, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreTxt.setFormat(Paths.font("alphabet.ttf"), 18, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1;
 		scoreTxt.visible = !ClientPrefs.hideHud;
 		add(scoreTxt);
 
 		judgementCounter = new FlxText(20, 0, 0, "", 20);
-		judgementCounter.setFormat(Paths.font("comic-sans.ttf"), 20, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		judgementCounter.setFormat(Paths.font("alphabet.ttf"), 20, FlxColor.WHITE, FlxTextAlign.LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		judgementCounter.borderSize = 1.25;
 		judgementCounter.borderQuality = 2;
 		judgementCounter.scrollFactor.set();
@@ -1135,20 +1136,20 @@ class PlayState extends MusicBeatState
 		+ " - "
 		+ CoolUtil.modeString()
 		+ " // Tac Engine v0.1";
-		var luaWatermark:Dynamic = callOnLuas('onWatermarkCreation', []);
+		var luaWatermark:Dynamic = callOnLuas('onWatermarkCreation', [CoolUtil.difficultyString(), CoolUtil.modeString()]);
 		if (luaWatermark is String) watermarkText = luaWatermark;
 		if (!ClientPrefs.hideWatermark)
 		{
 		songWatermark = new FlxText(4, textYPos, 0, watermarkText, 16);
 		//+ " ", 16);
 
-		songWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		songWatermark.setFormat(Paths.font("alphabet.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		songWatermark.scrollFactor.set();
 		songWatermark.cameras = [camHUD];
 		add(songWatermark);
 
 		creditsWatermark = new FlxText(4, healthBarBG.y + 50, 0, credits, 16);
-		creditsWatermark.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		creditsWatermark.setFormat(Paths.font("alphabet.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		creditsWatermark.scrollFactor.set();
 		add(creditsWatermark);
 		creditsWatermark.cameras = [camHUD];
@@ -1159,7 +1160,7 @@ class PlayState extends MusicBeatState
 			for (i in 0...chartTextArray.length)
 			{
 				var chartModeGuide = new FlxText(FlxG.width - 250, healthBarBG.y + 50 + i*30, 0, chartTextArray[i], 16);
-				chartModeGuide.setFormat(Paths.font("comic-sans.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+				chartModeGuide.setFormat(Paths.font("alphabet.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 				chartModeGuide.scrollFactor.set();
 				chartModeGuide.cameras = [camHUD];
 				add(chartModeGuide);
@@ -1167,7 +1168,7 @@ class PlayState extends MusicBeatState
 		}
 
 		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
-		botplayTxt.setFormat(Paths.font("comic-sans.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayTxt.setFormat(Paths.font("alphabet.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
 		botplayTxt.borderSize = 1.25;
 		botplayTxt.visible = cpuControlled;
@@ -1270,7 +1271,6 @@ class PlayState extends MusicBeatState
 					snapCamFollowToPos(400, -2050);
 					FlxG.camera.focusOn(camFollow);
 					FlxG.camera.zoom = 1.5;
-
 					new FlxTimer().start(0.8, function(tmr:FlxTimer)
 					{
 						camHUD.visible = true;
@@ -2741,39 +2741,60 @@ class PlayState extends MusicBeatState
 		}
 	}
 	function doDeathCheck(?skipHealthCheck:Bool = false) {
-		if (((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead)
+		if (((skipHealthCheck && instakillOnMiss) || health <= 0) && !practiceMode && !isDead && !gameOverDone)
 		{
-			var ret:Dynamic = callOnLuas('onGameOver', []);
-			if(ret != FunkinLua.Function_Stop) {
-				boyfriend.stunned = true;
-				deathCounter++;
-
-				persistentUpdate = false;
-				persistentDraw = false;
-				paused = true;
-
-				vocals.stop();
-				FlxG.sound.music.stop();
-
-				openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x - boyfriend.positionArray[0], boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollowPos.x, camFollowPos.y));
-				for (tween in modchartTweens) {
-					tween.active = true;
-				}
-				for (timer in modchartTimers) {
-					timer.active = true;
-				}
-
-				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
-				
-				#if desktop
-				// Game Over doesn't get his own variable because it's only used here
-				DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-				#end
-				isDead = true;
-				return true;
-			}
+			gameOver();
+			gameOverDone = true;
+			return true;
 		}
 		return false;
+	}
+
+	public function gameOver()
+	{
+		var ret:Dynamic = callOnLuas('onGameOver', []);
+		if(ret != FunkinLua.Function_Stop) {
+			boyfriend.stunned = true;
+			deathCounter++;
+
+			persistentUpdate = false;
+			persistentDraw = false;
+			paused = true;
+
+			vocals.stop();
+			FlxG.sound.music.stop();
+
+			var ret2:Dynamic = callOnLuas('onGameOverAnimation', []);
+			if (ret2 != FunkinLua.Function_Stop)
+			{
+				camHUD.visible = false;
+				if(boyfriend.animation.getByName('hurt') != null) {
+					boyfriend.playAnim('hurt', true);
+				}
+				moveCamera(false);
+				new FlxTimer().start(0.75, function(tmr:FlxTimer) {
+					die();
+				});
+			}
+		}
+	}
+
+	public function die()
+	{
+		openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x - boyfriend.positionArray[0], boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollowPos.x, camFollowPos.y));
+		for (tween in modchartTweens) {
+			tween.active = true;
+		}
+		for (timer in modchartTimers) {
+			timer.active = true;
+		}
+		// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+	
+		#if desktop
+		// Game Over doesn't get his own variable because it's only used here
+		DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+		#end
+		isDead = true;
 	}
 
 	public function checkEventNote() {
