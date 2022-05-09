@@ -3636,7 +3636,6 @@ class PlayState extends MusicBeatState
 
 			if (combo >= 10 || combo == 0)
 				insert(members.indexOf(strumLineNotes), numScore);
-				insert(members.indexOf(strumLineNotes), comboSpr);
 
 			FlxTween.tween(numScore, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
@@ -3648,6 +3647,9 @@ class PlayState extends MusicBeatState
 
 			daLoop++;
 		}
+
+		if (combo >= 10 || combo == 0)
+			insert(members.indexOf(strumLineNotes), comboSpr);
 		/* 
 			trace(combo);
 			trace(seperatedScore);
