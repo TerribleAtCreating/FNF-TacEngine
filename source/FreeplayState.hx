@@ -109,7 +109,10 @@ class FreeplayState extends MusicBeatState
 
 		for (i in 0...songs.length)
 		{
-			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songs[i].songName, true, false);
+			var locked = weekIsLocked(songs[i].week);
+			var songName = locked ? '???' : songs[i].songName;
+			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, songName, true, false);
+			songText.selectable = !locked;
 			songText.isMenuItem = true;
 			songText.targetY = i;
 			grpSongs.add(songText);
@@ -117,6 +120,7 @@ class FreeplayState extends MusicBeatState
 			Paths.currentModDirectory = songs[i].folder;
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
 			icon.sprTracker = songText;
+			if (locked) icon.color = 0xFF000000;
 
 			// using a FlxGroup is too much fuss!
 			iconArray.push(icon);
@@ -192,6 +196,11 @@ class FreeplayState extends MusicBeatState
 	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int)
 	{
 		songs.push(new SongMetadata(songName, weekNum, songCharacter, color));
+	}
+
+	function weekIsLocked(weekNum:Int) {
+		var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[weekNum]);
+		return (!leWeek.startUnlocked && leWeek.weekBefore.length > 0 && (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
 	}
 
 	/*public function addWeek(songs:Array<String>, weekNum:Int, weekColor:Int, ?songCharacters:Array<String>)
@@ -304,6 +313,11 @@ class FreeplayState extends MusicBeatState
 
 		else if (accepted)
 		{
+			if (!grpSongs.members[curSelected].selectable)
+			{
+				FlxG.sound.play(Paths.sound('badnoise1'));
+				return;
+			}
 			FlxG.sound.play(Paths.sound('confirmMenu'));
 			for (i in 0...grpSongs.length)
 			{

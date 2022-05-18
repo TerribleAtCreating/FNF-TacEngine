@@ -559,7 +559,8 @@ class StoryMenuState extends MusicBeatState
 		var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[curWeek]);
 		var stringThing:Array<String> = [];
 		for (i in 0...leWeek.songs.length) {
-			stringThing.push(leWeek.songs[i][0]);
+			if (!weekIsLocked(curWeek)) stringThing.push(leWeek.songs[i][0]);
+			else stringThing.push('???');
 		}
 
 		txtTracklist.text = '';

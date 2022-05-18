@@ -928,10 +928,10 @@ class FunkinLua {
 		});
 
 		Lua_helper.add_callback(lua, "addAnimationByGrid", function(obj:String, name:String, gridFrames:String, framerate:Int = 24) {
-			var strIndices:Array<String> = indices.trim().split(',');
+			var strFrames:Array<String> = gridFrames.trim().split(',');
 			var die:Array<Int> = [];
-			for (i in 0...strIndices.length) {
-				die.push(Std.parseInt(strIndices[i]));
+			for (i in 0...strFrames.length) {
+				die.push(Std.parseInt(strFrames[i]));
 			}
 
 			if(PlayState.instance.modchartSprites.exists(obj)) {
