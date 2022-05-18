@@ -2346,13 +2346,13 @@ class PlayState extends MusicBeatState
 		super.update(elapsed);
 		//prefix for score text
 		var prefixStuff:String = '';
-		if (isDead) prefixStuff += 'INVINCIBLE | ';
 
 		if(ratingName == '?') {
 			scoreTxt.text = prefixStuff + 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName;
 		} else {
 			scoreTxt.text = prefixStuff + 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingName + ' (' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;//peeps wanted no integer rating
 		}
+		if (cpuControlled) scoreTxt.text += ' | Combo: ' + combo;
 		if (chartingMode) scoreTxt.text += ' (CHARTING MODE)';
 
 		if(botplayTxt.visible) {
@@ -2768,9 +2768,12 @@ class PlayState extends MusicBeatState
 			if (ret2 != FunkinLua.Function_Stop)
 			{
 				camHUD.visible = false;
-				if(boyfriend.animation.getByName('hurt') != null) {
-					boyfriend.playAnim('hurt', true);
-				}
+				new FlxTimer().start(0.1, function(tmr:FlxTimer) {
+					if(boyfriend.animation.getByName('hurt') != null) {
+						boyfriend.playAnim('hurt', true);
+						boyfriend.specialAnim = true;
+					}
+				});
 				moveCamera(false);
 				new FlxTimer().start(0.75, function(tmr:FlxTimer) {
 					die();
@@ -3520,12 +3523,15 @@ class PlayState extends MusicBeatState
 			case "shit": // shit
 				totalNotesHit += 0;
 				shits++;
+				score = 0;
 			case "bad": // bad
 				totalNotesHit += 0.5;
 				bads++;
+				score = 180;
 			case "good": // good
 				totalNotesHit += 0.75;
 				goods++;
+				score = 270;
 			case "sick": // sick
 				totalNotesHit += 1;
 				sicks++;
@@ -3914,9 +3920,9 @@ class PlayState extends MusicBeatState
 			if(daNote.noteType == 'Alt Animation') daAlt = '-alt';
 
 			if(daNote.noteType == 'HD Note') {
-				if(boyfriend.animOffsets.exists('hurt')) {
-					boyfriend.playAnim('hurt', true);
-					boyfriend.specialAnim = true;
+				if(char.animOffsets.exists('hurt')) {
+					char.playAnim('hurt', true);
+					char.specialAnim = true;
 				}
 			}
 
@@ -4062,7 +4068,7 @@ class PlayState extends MusicBeatState
 				combo += 1;
 				popUpScore(note);
 				if(combo > 9999) combo = 9999;
-			}
+			} else if(cpuControlled) combo += 1;
 			health += note.hitHealth * healthGain;
 
 			if(!note.isSustainNote && ClientPrefs.noteJumping){

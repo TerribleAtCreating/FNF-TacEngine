@@ -859,6 +859,31 @@ class FunkinLua {
 				object.makeGraphic(width, height, colorNum);
 			}
 		});
+
+		Lua_helper.add_callback(lua, "loadGraphic", function(variable:String, image:String) {
+			var spr:FlxSprite = getObjectDirectly(variable);
+			if(spr != null && image != null && image.length > 0)
+			{
+				spr.loadGraphic(Paths.image(image));
+			}
+		});
+
+		Lua_helper.add_callback(lua, "loadGridGraphic", function(variable:String, image:String, width:Int, height:Int) {
+			var spr:FlxSprite = getObjectDirectly(variable);
+			if(spr != null && image != null && image.length > 0)
+			{
+				spr.loadGraphic(Paths.image(image), width, height);
+			}
+		});
+
+		Lua_helper.add_callback(lua, "loadFrames", function(variable:String, image:String) {
+			var spr:FlxSprite = getObjectDirectly(variable);
+			if(spr != null && image != null && image.length > 0)
+			{
+				spr.frames = Paths.getSparrowAtlas(image);
+			}
+		});
+
 		Lua_helper.add_callback(lua, "addAnimationByPrefix", function(obj:String, name:String, prefix:String, framerate:Int = 24, loop:Bool = true) {
 			if(PlayState.instance.modchartSprites.exists(obj)) {
 				var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(obj);
@@ -885,22 +910,48 @@ class FunkinLua {
 			}
 
 			if(PlayState.instance.modchartSprites.exists(obj)) {
-				var pussy:ModchartSprite = PlayState.instance.modchartSprites.get(obj);
-				pussy.animation.addByIndices(name, prefix, die, '', framerate, false);
-				if(pussy.animation.curAnim == null) {
-					pussy.animation.play(name, true);
+				var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(obj);
+				sprite.animation.addByIndices(name, prefix, die, '', framerate, false);
+				if(sprite.animation.curAnim == null) {
+					sprite.animation.play(name, true);
 				}
 				return;
 			}
 			
-			var pussy:FlxSprite = Reflect.getProperty(getInstance(), obj);
-			if(pussy != null) {
-				pussy.animation.addByIndices(name, prefix, die, '', framerate, false);
-				if(pussy.animation.curAnim == null) {
-					pussy.animation.play(name, true);
+			var sprite:FlxSprite = Reflect.getProperty(getInstance(), obj);
+			if(sprite != null) {
+				sprite.animation.addByIndices(name, prefix, die, '', framerate, false);
+				if(sprite.animation.curAnim == null) {
+					sprite.animation.play(name, true);
 				}
 			}
 		});
+
+		Lua_helper.add_callback(lua, "addAnimationByGrid", function(obj:String, name:String, gridFrames:String, framerate:Int = 24) {
+			var strIndices:Array<String> = indices.trim().split(',');
+			var die:Array<Int> = [];
+			for (i in 0...strIndices.length) {
+				die.push(Std.parseInt(strIndices[i]));
+			}
+
+			if(PlayState.instance.modchartSprites.exists(obj)) {
+				var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(obj);
+				sprite.animation.add(name, die, framerate, false, false);
+				if(sprite.animation.curAnim == null) {
+					sprite.animation.play(name, true);
+				}
+				return;
+			}
+			
+			var sprite:FlxSprite = Reflect.getProperty(getInstance(), obj);
+			if(sprite != null) {
+				sprite.animation.add(name, die, framerate, false, false);
+				if(sprite.animation.curAnim == null) {
+					sprite.animation.play(name, true);
+				}
+			}
+		});
+
 		Lua_helper.add_callback(lua, "objectPlayAnimation", function(obj:String, name:String, forced:Bool = false) {
 			if(PlayState.instance.modchartSprites.exists(obj)) {
 				PlayState.instance.modchartSprites.get(obj).animation.play(name, forced);
@@ -1397,10 +1448,10 @@ class FunkinLua {
 				for (i in 0...strIndices.length) {
 					die.push(Std.parseInt(strIndices[i]));
 				}
-				var pussy:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
-				pussy.animation.addByIndices(name, prefix, die, '', framerate, false);
-				if(pussy.animation.curAnim == null) {
-					pussy.animation.play(name, true);
+				var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(tag);
+				sprite.animation.addByIndices(name, prefix, die, '', framerate, false);
+				if(sprite.animation.curAnim == null) {
+					sprite.animation.play(name, true);
 				}
 			}
 		});
@@ -1507,6 +1558,19 @@ class FunkinLua {
 			return;
 		}
 		Reflect.setProperty(leArray, variable, value);
+	}
+
+	function getObjectDirectly(objectName:String, ?checkForTextsToo:Bool = true):Dynamic
+	{
+		var coverMeInPiss:Dynamic = null;
+		if(PlayState.instance.modchartSprites.exists(objectName)) {
+			coverMeInPiss = PlayState.instance.modchartSprites.get(objectName);
+		} else if(checkForTextsToo && PlayState.instance.modchartTexts.exists(objectName)) {
+			coverMeInPiss = PlayState.instance.modchartTexts.get(objectName);
+		} else {
+			coverMeInPiss = Reflect.getProperty(getInstance(), objectName);
+		}
+		return coverMeInPiss;
 	}
 
 	function resetTextTag(tag:String) {
