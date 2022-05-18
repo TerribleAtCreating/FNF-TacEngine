@@ -149,26 +149,27 @@ class WeekData {
 		}
 
 		#if MODS_ALLOWED
+		directories = Paths.getModDirectories();
+		trace('directories list: ' + directories);
 		for (i in 0...directories.length) {
-			var directory:String = directories[i] + 'weeks/';
-			if(FileSystem.exists(directory)) {
-				for (file in FileSystem.readDirectory(directory)) {
-					var path = haxe.io.Path.join([directory, file]);
-					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json')) {
-						var weekToCheck:String = file.substr(0, file.length - 5);
-						if(!weeksLoaded.exists(weekToCheck)) {
-							var week:WeekFile = getWeekFile(path);
-							if(week != null) {
-								var weekFile:WeekData = new WeekData(week);
-								if(i >= originalLength) {
-									weekFile.folder = directories[i].substring(Paths.mods().length, directories[i].length-1);
-								}
+			var directory:String = directories[i] + '/weeks/';
+			Paths.currentModDirectory = directories[i];
+			var modsSexList:Array<String> = CoolUtil.coolTextFile(Paths.modFolders('weeks/weekList.txt'));
+			for (j in 0...modsSexList.length)
+			{
+				var fileToCheck:String = directory + modsSexList[j] + '.json';
+				if(!weeksLoaded.exists(modsSexList[j])) {
+					var week:WeekFile = getWeekFile(Paths.mods(fileToCheck));
+					if(week != null) {
+						var weekFile:WeekData = new WeekData(week);
 
-								if((isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay)) {
-									weeksLoaded.set(weekToCheck, weekFile);
-									weeksList.push(weekToCheck);
-								}
-							}
+						#if MODS_ALLOWED
+							weekFile.folder = directories[i].substring(Paths.mods().length, directories[i].length-1);
+						#end
+
+						if(weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay))) {
+							weeksLoaded.set(modsSexList[j], weekFile);
+							weeksList.push(modsSexList[j]);
 						}
 					}
 				}
