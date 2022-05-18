@@ -1,4 +1,4 @@
-# Friday Night Funkin' - L Engine
+# Friday Night Funkin' - Tac Engine
 NOTE: This engine is based off [Psych Engine](https://github.com/ShadowMario/FNF-PsychEngine), so most assets may look familiar.
 
 ## Installation:
