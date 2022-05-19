@@ -749,6 +749,35 @@ class ChartingState extends MusicBeatState
 		copyLastButton.setGraphicSize(80, 30);
 		copyLastButton.updateHitbox();
 
+		var insertSectionButton:FlxButton = new FlxButton(10, 300, "Insert section here", function()
+		{
+			var bpm = Conductor.bpm;
+			var crochet = 60/bpm*1000/4;
+			for (section in curSection..._song.notes.length)
+			{
+				if (_song.notes[section].changeBPM) bpm = _song.notes[section].bpm;
+				crochet = 60/bpm*1000/4;
+				for (note in _song.notes[section].sectionNotes)
+				{
+					note[0] += crochet * (_song.notes[section].lengthInSteps);
+				}
+			}
+			var emptySection:SwagSection = {
+				sectionNotes: [],
+				lengthInSteps: 16,
+				typeOfSection: 0,
+				mustHitSection: true,
+				gfSection: false,
+				bpm: Conductor.bpm,
+				changeBPM: false,
+				altAnim: false
+			};
+			_song.notes.insert(curSection, emptySection);
+			updateGrid();
+		});
+		insertSectionButton.setGraphicSize(80, 30);
+		insertSectionButton.updateHitbox();
+
 		tab_group_section.add(stepperLength);
 		tab_group_section.add(stepperSectionBPM);
 		tab_group_section.add(check_mustHitSection);
@@ -761,6 +790,7 @@ class ChartingState extends MusicBeatState
 		tab_group_section.add(swapSection);
 		tab_group_section.add(stepperCopy);
 		tab_group_section.add(copyLastButton);
+		tab_group_section.add(insertSectionButton);
 
 		UI_box.addGroup(tab_group_section);
 	}
