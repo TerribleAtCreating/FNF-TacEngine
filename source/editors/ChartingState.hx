@@ -759,7 +759,7 @@ class ChartingState extends MusicBeatState
 				crochet = 60/bpm*1000/4;
 				for (note in _song.notes[section].sectionNotes)
 				{
-					note[0] += crochet * (_song.notes[section].lengthInSteps);
+					note[0] += crochet * 16;
 				}
 			}
 			var emptySection:SwagSection = {
