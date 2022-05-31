@@ -85,6 +85,7 @@ class WeekData {
 		var disabledMods:Array<String> = [];
 		var modsListPath:String = 'modsList.txt';
 		var directories:Array<String> = [Paths.mods(), Paths.getPreloadPath()];
+		var trimDirectories:Array<String> = [];
 		var originalLength:Int = directories.length;
 		if(FileSystem.exists(modsListPath))
 		{
@@ -102,6 +103,7 @@ class WeekData {
 					//trace('trying to push: ' + splitName[0]);
 					if (sys.FileSystem.isDirectory(path) && !Paths.ignoreModFolders.contains(splitName[0]) && !disabledMods.contains(splitName[0]) && !directories.contains(path + '/'))
 					{
+						trimDirectories.push(splitName[0]);
 						directories.push(path + '/');
 						//trace('pushed Directory: ' + splitName[0]);
 					}
@@ -149,8 +151,7 @@ class WeekData {
 		}
 
 		#if MODS_ALLOWED
-		directories = Paths.getModDirectories();
-		trace('directories list: ' + directories);
+		directories = trimDirectories;
 		for (i in 0...directories.length) {
 			var directory:String = directories[i] + '/weeks/';
 			Paths.currentModDirectory = directories[i];
