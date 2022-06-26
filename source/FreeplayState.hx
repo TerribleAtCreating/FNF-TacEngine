@@ -36,6 +36,7 @@ class FreeplayState extends MusicBeatState
 	var curMode:Int = 0;
 	private static var lastDifficultyName:String = '';
 	private static var lastModeName:String = '';
+	var hasSelected:Bool = false;
 
 	var scoreBG:FlxSprite;
 	var scoreText:FlxText;
@@ -223,6 +224,7 @@ class FreeplayState extends MusicBeatState
 	private static var vocals:FlxSound = null;
 	override function update(elapsed:Float)
 	{
+		super.update(elapsed);
 		if (FlxG.sound.music.volume < 0.7)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -256,6 +258,7 @@ class FreeplayState extends MusicBeatState
 		var ctrl = FlxG.keys.justPressed.CONTROL;
 
 		var shiftMult:Int = 1;
+		if (hasSelected) return;
 		if(FlxG.keys.pressed.SHIFT) shiftMult = 3;
 
 		if (upP)
@@ -319,6 +322,7 @@ class FreeplayState extends MusicBeatState
 				return;
 			}
 			FlxG.sound.play(Paths.sound('confirmMenu'));
+			hasSelected = true;
 			for (i in 0...grpSongs.length)
 			{
 				if (i != curSelected)
@@ -371,7 +375,6 @@ class FreeplayState extends MusicBeatState
 		{
 			openSubState(new GameplayChangersSubstate());
 		}
-		super.update(elapsed);
 	}
 
 	public static function destroyFreeplayVocals() {

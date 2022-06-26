@@ -331,11 +331,13 @@ class AwardEditorState extends MusicBeatState
 			if (sender == nameInputText)
 			{
 				reloadNameText();
+				awardFile.name = nameInputText.text;
 			} else if (sender == descInputText)
 			{
 				var text:String = descInputText.text;
 				if(text == null || text.length < 1) text = ' ';
 				descText.text = text;
+				awardFile.description = text;
 			} else if (sender == fileNameInputText)
 			{
 				remove(icon);
@@ -344,6 +346,7 @@ class AwardEditorState extends MusicBeatState
 				icon.sprTracker = optionText;
 				achievementArray.push(icon);
 				add(icon);
+				awardFileName = fileNameInputText.text;
 			}
 		}
 	}

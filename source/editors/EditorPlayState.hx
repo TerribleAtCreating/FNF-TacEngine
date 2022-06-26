@@ -350,7 +350,7 @@ class EditorPlayState extends MusicBeatState
 				if(daNote.copyX) {
 					daNote.x = strumX;
 				}
-				if(daNote.copyY) {
+				if(daNote.scrollY) {
 					if (ClientPrefs.downScroll) {
 						daNote.y = (strumY + 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
 						if (daNote.isSustainNote) {

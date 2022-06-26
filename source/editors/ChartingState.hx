@@ -177,11 +177,12 @@ class ChartingState extends MusicBeatState
 	/**/
 	 
 	public var quants:Array<Float> = [
-	4,// quarter
-	2,//half
-	4/3,
-	1,
-	4/8];//eight
+	4, //beat
+	2, //2 steps
+	1, //step
+	0.5, //half step
+	0.25, //quarter step
+	0.125]; //eighth of step
 	
 	
 	public static var curQuant = 0;
@@ -1492,7 +1493,7 @@ class ChartingState extends MusicBeatState
 			
 				var datimess = [];
 				
-				var daTime:Float = Math.round(Conductor.stepCrochet*quants[curQuant]);
+				var daTime:Float = FlxMath.roundDecimal(Conductor.stepCrochet*quants[curQuant], 2);
 				var cuquant = Std.int(32/quants[curQuant]);
 				for (i in 0...cuquant){
 					datimess.push(sectionStartTime() + daTime * i);
@@ -2377,7 +2378,7 @@ class ChartingState extends MusicBeatState
 				}
 			}
 
-			var section:SwagSection = _song.notes[sec];
+			var section:SwagSection = Reflect.copy(_song.notes[sec]);
 			section.sectionNotes = arrayNotes;
 			hitNotes.push(section);
 		}

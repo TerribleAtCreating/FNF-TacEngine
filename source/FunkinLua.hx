@@ -1110,6 +1110,13 @@ class FunkinLua {
 			}
 			#end
 		});
+
+		Lua_helper.add_callback(lua, "removeGlitchSprite", function() {
+			#if windows
+			PlayState.instance.shaderSprite = null;
+			#end
+		});
+
 		Lua_helper.add_callback(lua, "startDialogue", function(dialogueFile:String, music:String = null) {
 			var path:String = Paths.modsJson(Paths.formatToSongPath(PlayState.SONG.song) + '/' + dialogueFile);
 			if(!FileSystem.exists(path)) {

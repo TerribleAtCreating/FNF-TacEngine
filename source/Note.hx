@@ -55,9 +55,12 @@ class Note extends FlxSprite
 	public var multAlpha:Float = 1;
 
 	public var copyX:Bool = true;
-	public var copyY:Bool = true;
+	public var copyY:Bool = false;
 	public var copyAngle:Bool = true;
 	public var copyAlpha:Bool = true;
+
+	public var scrollX:Bool = false; //might use these for scroll directions instead -tac
+	public var scrollY:Bool = true;
 
 	public var hitHealth:Float = 0.023;
 	public var missHealth:Float = 0.0475;
@@ -127,7 +130,7 @@ class Note extends FlxSprite
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
 		this.inEditor = inEditor;
-		this.mustPress = isPlayer; //this would be useless anyway, but for noteskin purposes its there
+		this.mustPress = isPlayer; //this would be useless anyway, but for note texture purposes its there
 
 		x += (ClientPrefs.middleScroll ? PlayState.STRUM_X_MIDDLESCROLL : PlayState.STRUM_X) + 50;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?

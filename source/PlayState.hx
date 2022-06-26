@@ -51,7 +51,6 @@ import Achievements;
 import StageData;
 import FunkinLua;
 import DialogueBoxPsych;
-import Shaders;
 #if windows
 import Shaders;
 #end
@@ -2501,7 +2500,7 @@ class PlayState extends MusicBeatState
 			var time:Float = 1500;
 			if(roundedSpeed < 1) time /= roundedSpeed;
 
-			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time && notes.length < 50)
+			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time && notes.length < 100)
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				notes.add(dunceNote);
@@ -2553,13 +2552,16 @@ class PlayState extends MusicBeatState
 				if(daNote.copyX) {
 					daNote.x = strumX;
 				}
+				if(daNote.copyY) {
+					daNote.y = strumY;
+				}
 				if(daNote.copyAngle) {
 					daNote.angle = strumAngle;
 				}
 				if(daNote.copyAlpha) {
 					daNote.alpha = strumAlpha;
 				}
-				if(daNote.copyY) {
+				if(daNote.scrollY) {
 					if (ClientPrefs.downScroll) {
 						daNote.y = (strumY + 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
 						if (daNote.isSustainNote && !ClientPrefs.keSustains) {
@@ -3146,7 +3148,7 @@ class PlayState extends MusicBeatState
 				if(Math.isNaN(val1)) val1 = 1;
 				if(Math.isNaN(val2)) val2 = 0;
 
-				var newValue:Float = SONG.speed * ClientPrefs.getGameplaySetting('scrollspeed', 1) * val1;
+				var newValue:Float = ClientPrefs.getGameplaySetting('scrollspeed', 1) * val1;
 
 				if(val2 <= 0)
 				{
@@ -3299,17 +3301,6 @@ class PlayState extends MusicBeatState
 				return;
 			}
 		}
-
-		if (chartingMode)
-		{
-			CustomFadeTransition.nextCamera = camOther;
-			if(FlxTransitionableState.skipNextTransIn) {
-				CustomFadeTransition.nextCamera = null;
-			}
-			MusicBeatState.resetState();
-			FlxG.sound.music.volume = 0;
-			return;
-		}
 		
 		timeBarBG.visible = false;
 		timeBar.visible = false;
@@ -3358,6 +3349,16 @@ class PlayState extends MusicBeatState
 		#end
 
 		if(ret != FunkinLua.Function_Stop && !transitioning) {
+			if (chartingMode)
+			{
+				CustomFadeTransition.nextCamera = camOther;
+				if(FlxTransitionableState.skipNextTransIn) {
+					CustomFadeTransition.nextCamera = null;
+				}
+				MusicBeatState.resetState();
+				FlxG.sound.music.volume = 0;
+				return;
+			}
 			if (SONG.validScore)
 			{
 				#if !switch
@@ -4059,7 +4060,7 @@ class PlayState extends MusicBeatState
 				combo += 1;
 				popUpScore(note);
 				if(combo > 9999) combo = 9999;
-			} else if(cpuControlled) combo += 1;
+			} else if(cpuControlled && !note.isSustainNote) combo += 1; //just the combo alone
 			health += note.hitHealth * healthGain;
 
 			if(!note.isSustainNote && ClientPrefs.noteJumping){
