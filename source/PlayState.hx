@@ -1618,7 +1618,18 @@ class PlayState extends MusicBeatState
 		if(ret != FunkinLua.Function_Stop) {
 			generateStaticArrows(0);
 			generateStaticArrows(1);
+			for (i in 0...4) {
+				trace(i);
+				trace(opponentStrums.members[i].x);
+				strumNotesX[i] = opponentStrums.members[i].x;
+				strumNotesY[i] = opponentStrums.members[i].y;
+	
+				strumNotesX[i+4] = playerStrums.members[i].x;
+				strumNotesY[i+4] = playerStrums.members[i].y;
+			}
 
+			trace(strumNotesX);
+			trace(strumNotesY);
 			startedCountdown = true;
 			Conductor.songPosition = 0;
 			Conductor.songPosition -= Conductor.crochet * 5;
@@ -1770,15 +1781,6 @@ class PlayState extends MusicBeatState
 	function startSong():Void
 	{
 		startingSong = false;
-		for (i in 0...playerStrums.length) {
-			strumNotesX[i] = opponentStrums.members[i].x;
-			strumNotesY[i] = opponentStrums.members[i].y;
-
-			strumNotesX[i+4] = playerStrums.members[i].x;
-			strumNotesY[i+4] = playerStrums.members[i].y;
-
-			//trace("Strum1 X = ", hazardModChartDefaultStrumX[i+4]);
-		}
 
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
@@ -2756,6 +2758,7 @@ class PlayState extends MusicBeatState
 
 			vocals.stop();
 			FlxG.sound.music.stop();
+			canPause = false;
 
 			var ret2:Dynamic = callOnLuas('onGameOverAnimation', []);
 			if (ret2 != FunkinLua.Function_Stop)

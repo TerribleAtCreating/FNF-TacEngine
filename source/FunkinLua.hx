@@ -265,6 +265,18 @@ class FunkinLua {
 			}
 		});
 
+		Lua_helper.add_callback(lua, "getPropertyFromArray", function(obj:String, index:Int) {
+			var theArray = Reflect.getProperty(getInstance(), obj);
+			if (theArray is Array) return Reflect.getProperty(getInstance(), obj)[index];
+			return null;
+		});
+
+		Lua_helper.add_callback(lua, "setPropertyFromArray", function(obj:String, index:Int, value:Dynamic) {
+			var theArray = Reflect.getProperty(getInstance(), obj);
+			if (theArray is Array) Reflect.getProperty(getInstance(), obj)[index] = value;
+			return null;
+		});
+
 		Lua_helper.add_callback(lua, "setNoteData", function(index:Int, value:Int) {
 			var strumTime = PlayState.instance.unspawnNotes[index].strumTime;
 			var isHold = PlayState.instance.unspawnNotes[index].isSustainNote;
