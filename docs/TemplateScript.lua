@@ -164,3 +164,9 @@ function onTimerCompleted(tag, loops, loopsLeft)
 	-- loops = how many loops it will have done when it ends completely
 	-- loopsLeft = how many are remaining
 end
+
+function onWatermarkCreation(difficulty, mode)
+	-- difficulty = name of difficulty (capitalized)
+	-- mode = name of gameplay mode (capitalized)
+	-- write shit here, the text you return will be placed as the song watermark (the entire thing)
+end
