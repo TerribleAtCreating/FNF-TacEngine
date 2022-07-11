@@ -46,6 +46,7 @@ typedef TitleData =
 	gfx:Float,
 	gfy:Float,
 	backgroundSprite:String,
+	introbpm:Int,
 	bpm:Int,
 	xmlName:String,
 	leftIndices:Array<Int>,
@@ -243,7 +244,7 @@ class TitleState extends MusicBeatState
 			}
 		}
 
-		Conductor.changeBPM(titleJSON.bpm);
+		Conductor.changeBPM(titleJSON.introbpm);
 		persistentUpdate = true;
 
 		var bg:FlxSprite = new FlxSprite();
@@ -632,7 +633,7 @@ class TitleState extends MusicBeatState
 		if (!skippedIntro)
 		{
 			remove(logoSpr);
-
+			Conductor.changeBPM(titleJSON.bpm);
 			FlxG.camera.flash(FlxColor.WHITE, 4);
 			remove(credGroup);
 			skippedIntro = true;

@@ -103,7 +103,6 @@ class Achievements {
 						awardDesc = stuff.description;
 						isHidden = stuff.hidden;
 						if (getAchievementIndex(award) == -1) achievementsStuff.push([awardName, awardDesc, award, isHidden]);
-						trace('Found achievement: ' + awardName);
 					}
 				}
 			}

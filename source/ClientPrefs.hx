@@ -24,7 +24,7 @@ class ClientPrefs {
 	public static var imagesPersist:Bool = false;
 	public static var ghostTapping:Bool = true;
 	public static var antimash:Bool = true;
-	public static var pussyInput:Bool = false;
+	public static var holdInput:Bool = false;
 	public static var timeBarType:String = 'Time Left';
 	public static var scoreZoom:Bool = true;
 	public static var noReset:Bool = false;
@@ -83,7 +83,6 @@ class ClientPrefs {
 
 	public static function loadDefaultKeys() {
 		defaultKeys = keyBinds.copy();
-		//trace(defaultKeys);
 	}
 
 	public static function saveSettings() {
@@ -95,8 +94,6 @@ class ClientPrefs {
 		FlxG.save.data.noteSplashes = noteSplashes;
 		FlxG.save.data.lowQuality = lowQuality;
 		FlxG.save.data.framerate = framerate;
-		//FlxG.save.data.cursing = cursing;
-		//FlxG.save.data.violence = violence;
 		FlxG.save.data.camZooms = camZooms;
 		FlxG.save.data.noteOffset = noteOffset;
 		FlxG.save.data.hideHud = hideHud;
@@ -104,6 +101,7 @@ class ClientPrefs {
 		FlxG.save.data.imagesPersist = imagesPersist;
 		FlxG.save.data.ghostTapping = ghostTapping;
 		FlxG.save.data.antimash = antimash;
+		FlxG.save.data.holdInput = holdInput;
 		FlxG.save.data.timeBarType = timeBarType;
 		FlxG.save.data.scoreZoom = scoreZoom;
 		FlxG.save.data.noReset = noReset;
@@ -193,6 +191,9 @@ class ClientPrefs {
 		}
 		if(FlxG.save.data.antimash != null) {
 			antimash = FlxG.save.data.antimash;
+		}
+		if(FlxG.save.data.holdInput != null) {
+			antimash = FlxG.save.data.holdInput;
 		}
 		if(FlxG.save.data.timeBarType != null) {
 			timeBarType = FlxG.save.data.timeBarType;

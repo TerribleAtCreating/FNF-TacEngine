@@ -206,7 +206,6 @@ class Alphabet extends FlxSpriteGroup
 		if (name == null || name.trim() == '') name = 'dialogue';
 		soundDialog = Paths.sound(name);
 		if(soundDialog == null) soundDialog = Paths.sound('dialogue');
-		trace(soundDialog);
 	}
 
 	var typeTimer:FlxTimer = null;
@@ -214,8 +213,6 @@ class Alphabet extends FlxSpriteGroup
 	{
 		_finalText = text;
 		doSplitWords();
-
-		// trace(arrayShit);
 
 		if(soundDialog == null)
 		{

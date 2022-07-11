@@ -84,7 +84,8 @@ class CustomFadeTransition extends MusicBeatSubstate {
 		if(leTween != null) {
 			#if MODS_ALLOWED
 			if(isTransIn) {
-				Paths.destroyLoadedImages();
+				Paths.clearStoredMemory();
+				Paths.clearUnusedMemory();
 			}
 			#end
 			finishCallback();

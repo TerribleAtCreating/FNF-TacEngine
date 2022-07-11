@@ -39,7 +39,7 @@ import Discord;
 
 using StringTools;
 
-class FunkinLua {
+class FunkinLuaNew {
 	public static var Function_Stop = 1;
 	public static var Function_Continue = 0;
 
@@ -259,150 +259,6 @@ class FunkinLua {
 				PlayState.instance.vocals.pause();
 				PlayState.instance.vocals.volume = 0;
 			}
-		});
-
-		//stuff 4 noobz like you B)
-		
-		
-		Lua_helper.add_callback(lua, "getProperty", function(variable:String) {
-			var killMe:Array<String> = variable.split('.');
-			if(killMe.length > 1) {
-				var property:Dynamic = null;
-				if(PlayState.instance.modchartSprites.exists(killMe[0])) {
-					property = PlayState.instance.modchartSprites.get(killMe[0]);
-				} else if(PlayState.instance.modchartTexts.exists(killMe[0])) {
-					property = PlayState.instance.modchartTexts.get(killMe[0]);
-				} else {
-					property = Reflect.getProperty(getInstance(), killMe[0]);
-				}
-
-				for (i in 1...killMe.length-1) {
-					property = Reflect.getProperty(property, killMe[i]);
-				}
-				return Reflect.getProperty(property, killMe[killMe.length-1]);
-			}
-			return Reflect.getProperty(getInstance(), variable);
-		});
-		Lua_helper.add_callback(lua, "setProperty", function(variable:String, value:Dynamic) {
-			var killMe:Array<String> = variable.split('.');
-			if(killMe.length > 1) {
-				var property:Dynamic = null;
-				if(PlayState.instance.modchartSprites.exists(killMe[0])) {
-					property = PlayState.instance.modchartSprites.get(killMe[0]);
-				} else if(PlayState.instance.modchartTexts.exists(killMe[0])) {
-					property = PlayState.instance.modchartTexts.get(killMe[0]);
-				} else {
-					property = Reflect.getProperty(getInstance(), killMe[0]);
-				}
-
-				for (i in 1...killMe.length-1) {
-					property = Reflect.getProperty(property, killMe[i]);
-				}
-				return Reflect.setProperty(property, killMe[killMe.length-1], value);
-			}
-			return Reflect.setProperty(getInstance(), variable, value);
-		});
-		Lua_helper.add_callback(lua, "getPropertyFromGroup", function(obj:String, index:Int, variable:Dynamic) {
-			if(Std.isOfType(Reflect.getProperty(getInstance(), obj), FlxTypedGroup)) {
-				return getGroupStuff(Reflect.getProperty(getInstance(), obj).members[index], variable);
-			}
-
-			var leArray:Dynamic = Reflect.getProperty(getInstance(), obj)[index];
-			if(leArray != null) {
-				if(Type.typeof(variable) == ValueType.TInt) {
-					return leArray[variable];
-				}
-				return getGroupStuff(leArray, variable);
-			}
-			luaTrace("Object #" + index + " from group: " + obj + " doesn't exist!");
-			return null;
-		});
-		Lua_helper.add_callback(lua, "setPropertyFromGroup", function(obj:String, index:Int, variable:Dynamic, value:Dynamic) {
-			if(Std.isOfType(Reflect.getProperty(getInstance(), obj), FlxTypedGroup)) {
-				setGroupStuff(Reflect.getProperty(getInstance(), obj).members[index], variable, value);
-				return;
-			}
-
-			var leArray:Dynamic = Reflect.getProperty(getInstance(), obj)[index];
-			if(leArray != null) {
-				if(Type.typeof(variable) == ValueType.TInt) {
-					leArray[variable] = value;
-					return;
-				}
-				setGroupStuff(leArray, variable, value);
-			}
-		});
-
-		Lua_helper.add_callback(lua, "getPropertyFromArray", function(obj:String, index:Int) {
-			var theArray = Reflect.getProperty(getInstance(), obj);
-			if (theArray is Array) return Reflect.getProperty(getInstance(), obj)[index];
-			return null;
-		});
-
-		Lua_helper.add_callback(lua, "setPropertyFromArray", function(obj:String, index:Int, value:Dynamic) {
-			var theArray = Reflect.getProperty(getInstance(), obj);
-			if (theArray is Array) Reflect.getProperty(getInstance(), obj)[index] = value;
-			return null;
-		});
-
-		Lua_helper.add_callback(lua, "getPropertyFromMap", function(obj:String, tag:Dynamic, variable:Dynamic) {
-			var leMap:Map<Dynamic, Dynamic> = Reflect.getProperty(getInstance(), obj);
-			if(leMap.get(tag) != null) {
-				getGroupStuff(leMap.get(tag), variable);
-			}
-			luaTrace("Object" + tag + " from map: " + obj + " doesn't exist!");
-			return null;
-		});
-
-		Lua_helper.add_callback(lua, "setPropertyFromMap", function(obj:String, tag:Dynamic, variable:Dynamic, value:Dynamic) {
-			var leMap:Map<Dynamic, Dynamic> = Reflect.getProperty(getInstance(), obj);
-			if(leMap.get(tag) != null) {
-				setGroupStuff(leMap.get(tag), variable, value);
-			}
-			return;
-		});
-
-		Lua_helper.add_callback(lua, "setNoteData", function(index:Int, value:Int) {
-			var strumTime = PlayState.instance.unspawnNotes[index].strumTime;
-			var isHold = PlayState.instance.unspawnNotes[index].isSustainNote;
-			var oldNote = PlayState.instance.unspawnNotes[index-1];
-			var gottaHit = PlayState.instance.unspawnNotes[index].mustPress;
-			PlayState.instance.unspawnNotes[index] = new Note(strumTime, value%4, oldNote, isHold, false, gottaHit);
-		});
-		Lua_helper.add_callback(lua, "removeFromGroup", function(obj:String, index:Int, dontDestroy:Bool = false) {
-			if(Std.isOfType(Reflect.getProperty(getInstance(), obj), FlxTypedGroup)) {
-				var sex = Reflect.getProperty(getInstance(), obj).members[index];
-				if(!dontDestroy)
-					sex.kill();
-				Reflect.getProperty(getInstance(), obj).remove(sex, true);
-				if(!dontDestroy)
-					sex.destroy();
-				return;
-			}
-			Reflect.getProperty(getInstance(), obj).remove(Reflect.getProperty(getInstance(), obj)[index]);
-		});
-
-		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String) {
-			var killMe:Array<String> = variable.split('.');
-			if(killMe.length > 1) {
-				var property:Dynamic = Reflect.getProperty(Type.resolveClass(classVar), killMe[0]);
-				for (i in 1...killMe.length-1) {
-					property = Reflect.getProperty(property, killMe[i]);
-				}
-				return Reflect.getProperty(property, killMe[killMe.length-1]);
-			}
-			return Reflect.getProperty(Type.resolveClass(classVar), variable);
-		});
-		Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic) {
-			var killMe:Array<String> = variable.split('.');
-			if(killMe.length > 1) {
-				var property:Dynamic = Reflect.getProperty(Type.resolveClass(classVar), killMe[0]);
-				for (i in 1...killMe.length-1) {
-					property = Reflect.getProperty(property, killMe[i]);
-				}
-				return Reflect.setProperty(property, killMe[killMe.length-1], value);
-			}
-			return Reflect.setProperty(Type.resolveClass(classVar), variable, value);
 		});
 
 		//shitass stuff for epic coders like me B)  *image of obama giving himself a medal*
@@ -660,38 +516,6 @@ class FunkinLua {
 		Lua_helper.add_callback(lua, "cancelTimer", function(tag:String) {
 			cancelTimer(tag);
 		});
-
-		/*Lua_helper.add_callback(lua, "getPropertyAdvanced", function(varsStr:String) {
-			var variables:Array<String> = varsStr.replace(' ', '').split(',');
-			var leClass:Class<Dynamic> = Type.resolveClass(variables[0]);
-			if(variables.length > 2) {
-				var curProp:Dynamic = Reflect.getProperty(leClass, variables[1]);
-				if(variables.length > 3) {
-					for (i in 2...variables.length-1) {
-						curProp = Reflect.getProperty(curProp, variables[i]);
-					}
-				}
-				return Reflect.getProperty(curProp, variables[variables.length-1]);
-			} else if(variables.length == 2) {
-				return Reflect.getProperty(leClass, variables[variables.length-1]);
-			}
-			return null;
-		});
-		Lua_helper.add_callback(lua, "setPropertyAdvanced", function(varsStr:String, value:Dynamic) {
-			var variables:Array<String> = varsStr.replace(' ', '').split(',');
-			var leClass:Class<Dynamic> = Type.resolveClass(variables[0]);
-			if(variables.length > 2) {
-				var curProp:Dynamic = Reflect.getProperty(leClass, variables[1]);
-				if(variables.length > 3) {
-					for (i in 2...variables.length-1) {
-						curProp = Reflect.getProperty(curProp, variables[i]);
-					}
-				}
-				return Reflect.setProperty(curProp, variables[variables.length-1], value);
-			} else if(variables.length == 2) {
-				return Reflect.setProperty(leClass, variables[variables.length-1], value);
-			}
-		});*/
 		//playstate dot instance spam
 		Lua_helper.add_callback(lua, "changeHealthIcon", function(char:String = 'dad', name:String) {
 			if (char == 'dad') PlayState.instance.iconP2.changeIcon(name);
@@ -925,6 +749,7 @@ class FunkinLua {
 			leSprite.antialiasing = ClientPrefs.globalAntialiasing;
 			PlayState.instance.modchartSprites.set(tag, leSprite);
 			leSprite.active = true;
+			return Convert.toLua(lua, leSprite)
 		});
 		Lua_helper.add_callback(lua, "makeAnimatedLuaSprite", function(tag:String, image:String, x:Float, y:Float) {
 			tag = tag.replace('.', '');
@@ -933,20 +758,14 @@ class FunkinLua {
 			leSprite.frames = Paths.getSparrowAtlas(image);
 			leSprite.antialiasing = ClientPrefs.globalAntialiasing;
 			PlayState.instance.modchartSprites.set(tag, leSprite);
+			return Convert.toLua(lua, leSprite)
 		});
 
-		Lua_helper.add_callback(lua, "makeGraphic", function(obj:String, width:Int, height:Int, color:String) {
+		Lua_helper.add_callback(lua, "makeGraphic", function(obj:ModchartSprite, width:Int, height:Int, color:String) {
 			var colorNum:Int = Std.parseInt(color);
 			if(!color.startsWith('0x')) colorNum = Std.parseInt('0xff' + color);
-
-			if(PlayState.instance.modchartSprites.exists(obj)) {
-				PlayState.instance.modchartSprites.get(obj).makeGraphic(width, height, colorNum);
-				return;
-			}
-
-			var object:FlxSprite = Reflect.getProperty(getInstance(), obj);
-			if(object != null) {
-				object.makeGraphic(width, height, colorNum);
+			if(obj != null) {
+				obj.makeGraphic(width, height, colorNum);
 			}
 		});
 
@@ -974,17 +793,7 @@ class FunkinLua {
 			}
 		});
 
-		Lua_helper.add_callback(lua, "addAnimationByPrefix", function(obj:String, name:String, prefix:String, framerate:Int = 24, loop:Bool = true) {
-			if(PlayState.instance.modchartSprites.exists(obj)) {
-				var sprite:ModchartSprite = PlayState.instance.modchartSprites.get(obj);
-				sprite.animation.addByPrefix(name, prefix, framerate, loop);
-				if(sprite.animation.curAnim == null) {
-					sprite.animation.play(name, true);
-				}
-				return;
-			}
-			
-			var sprite:FlxSprite = Reflect.getProperty(getInstance(), obj);
+		Lua_helper.add_callback(lua, "addAnimationByPrefix", function(obj:ModchartSprite, name:String, prefix:String, framerate:Int = 24, loop:Bool = true) {
 			if(sprite != null) {
 				sprite.animation.addByPrefix(name, prefix, framerate, loop);
 				if(sprite.animation.curAnim == null) {

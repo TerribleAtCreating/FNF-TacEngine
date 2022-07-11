@@ -12,4 +12,4 @@ typedef SwagSection =
 	var altAnim:Bool;
 }
 
-//why was "class Section" even here, its not used smh
+//why was "class Section" even here, its not used

@@ -21,7 +21,6 @@ class Note extends FlxSprite
 	public var wasGoodHit:Bool = false;
 	public var ignoreNote:Bool = false;
 	public var hitByOpponent:Bool = false;
-	public var noteWasHit:Bool = false;
 	public var prevNote:Note;
 
 	public var sustainLength:Float = 0;
@@ -37,10 +36,6 @@ class Note extends FlxSprite
 	private var earlyHitMult:Float = 0.5;
 
 	public static var swagWidth:Float = 160 * 0.7;
-	public static var PURP_NOTE:Int = 0;
-	public static var GREEN_NOTE:Int = 2;
-	public static var BLUE_NOTE:Int = 1;
-	public static var RED_NOTE:Int = 3;
 
 	// Lua shit
 	public var noteSplashDisabled:Bool = false;
@@ -69,7 +64,6 @@ class Note extends FlxSprite
 
 	public var noAnimation:Bool = false;
 	public var hitCausesMiss:Bool = false;
-	public var distance:Float = 2000;//plan on doing scroll directions soon -bb
 	private function set_texture(value:String):String {
 		if(texture != value) {
 			reloadNote('', value);
@@ -287,9 +281,8 @@ class Note extends FlxSprite
 		}
 		updateHitbox();
 
-		if(animName != null)
-			animation.play(animName, true);
-
+		if(animName != null) animation.play(animName, true);
+		
 		if(inEditor) {
 			setGraphicSize(ChartingState.GRID_SIZE, ChartingState.GRID_SIZE);
 			updateHitbox();
@@ -321,46 +314,36 @@ class Note extends FlxSprite
 
 	function loadPixelNoteAnims() {
 		if(isSustainNote) {
-			animation.add('purpleholdend', [PURP_NOTE + 4]);
-			animation.add('greenholdend', [GREEN_NOTE + 4]);
-			animation.add('redholdend', [RED_NOTE + 4]);
-			animation.add('blueholdend', [BLUE_NOTE + 4]);
+			animation.add('purpleholdend', [0 + 4]);
+			animation.add('greenholdend', [2 + 4]);
+			animation.add('redholdend', [3 + 4]);
+			animation.add('blueholdend', [1 + 4]);
 
-			animation.add('purplehold', [PURP_NOTE]);
-			animation.add('greenhold', [GREEN_NOTE]);
-			animation.add('redhold', [RED_NOTE]);
-			animation.add('bluehold', [BLUE_NOTE]);
+			animation.add('purplehold', [0]);
+			animation.add('greenhold', [2]);
+			animation.add('redhold', [3]);
+			animation.add('bluehold', [1]);
 		} else {
-			animation.add('greenScroll', [GREEN_NOTE + 4]);
-			animation.add('redScroll', [RED_NOTE + 4]);
-			animation.add('blueScroll', [BLUE_NOTE + 4]);
-			animation.add('purpleScroll', [PURP_NOTE + 4]);
+			animation.add('greenScroll', [2 + 4]);
+			animation.add('redScroll', [3 + 4]);
+			animation.add('blueScroll', [1 + 4]);
+			animation.add('purpleScroll', [0 + 4]);
 		}
 	}
 
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-
-		if (mustPress)
-		{
-			// ok river
 			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
 				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * earlyHitMult))
 				canBeHit = true;
 			else
 				canBeHit = false;
-
 			if (strumTime < Conductor.songPosition - Conductor.safeZoneOffset && !wasGoodHit)
 				tooLate = true;
-		}
-		else
-		{
-			canBeHit = false;
-
+			if (!mustPress)	canBeHit = false;
 			if (strumTime <= Conductor.songPosition)
 				wasGoodHit = true;
-		}
 
 		if (tooLate && !inEditor)
 		{

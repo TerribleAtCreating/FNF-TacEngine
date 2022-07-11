@@ -70,9 +70,9 @@ class GameplaySettingsSubState extends BaseOptionsMenu
 			true);
 		addOption(option);
 
-		var option:Option = new Option('Pussy Input',
-			"If checked, you only need to hold instead of pressing.\nAlso classifies you as a pussy. Pussies do not get saved scores.",
-			'pussyInput',
+		var option:Option = new Option('Hold Input',
+			"If checked, you only need to hold instead of pressing.\nDisables score saving.",
+			'holdInput',
 			'bool',
 			false);
 		addOption(option);

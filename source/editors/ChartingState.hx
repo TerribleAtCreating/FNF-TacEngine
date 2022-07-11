@@ -212,9 +212,10 @@ class ChartingState extends MusicBeatState
 			addSection();
 			PlayState.SONG = _song;
 		}
-		PlayState.activateChartingMode();
+		PlayState.chartingMode = true;
 		#if MODS_ALLOWED
-		Paths.destroyLoadedImages();
+		Paths.clearStoredMemory();
+		Paths.clearUnusedMemory();
 		#end
 
 		#if desktop
@@ -476,7 +477,7 @@ class ChartingState extends MusicBeatState
 		clear_notes.color = FlxColor.RED;
 		clear_notes.label.color = FlxColor.WHITE;
 
-		var stepperBPM:FlxUINumericStepper = new FlxUINumericStepper(10, 70, 1, 1, 1, 339, 1);
+		var stepperBPM:FlxUINumericStepper = new FlxUINumericStepper(10, 70, 1, 1, 1, 999, 1);
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
 
@@ -644,6 +645,9 @@ class ChartingState extends MusicBeatState
 
 	var sectionToCopy:Int = 0;
 	var notesCopied:Array<Dynamic>;
+	var notesSetQueue:Array<Dynamic>;
+
+	var noteTypeDropDown:FlxUIDropDownMenuCustom;
 
 	function addSectionUI():Void
 	{
@@ -678,6 +682,56 @@ class ChartingState extends MusicBeatState
 			stepperSectionBPM.value = Conductor.bpm;
 		}
 		stepperSectionBPM.name = 'section_bpm';
+		var key:Int = 0;
+		var displayNameList:Array<String> = [];
+		while (key < noteTypeList.length) {
+			displayNameList.push(noteTypeList[key]);
+			noteTypeMap.set(noteTypeList[key], key);
+			noteTypeIntMap.set(key, noteTypeList[key]);
+			key++;
+		}
+		#if LUA_ALLOWED
+		var directories:Array<String> = [Paths.mods('custom_notetypes/'), Paths.mods(Paths.currentModDirectory + '/custom_notetypes/')];
+		for (i in 0...directories.length) {
+			var directory:String =  directories[i];
+			if(FileSystem.exists(directory)) {
+				for (file in FileSystem.readDirectory(directory)) {
+					var path = haxe.io.Path.join([directory, file]);
+					if (!FileSystem.isDirectory(path) && file.endsWith('.lua')) {
+						var fileToCheck:String = file.substr(0, file.length - 4);
+						if(!noteTypeMap.exists(fileToCheck)) {
+							displayNameList.push(fileToCheck);
+							noteTypeMap.set(fileToCheck, key);
+							noteTypeIntMap.set(key, fileToCheck);
+							key++;
+						}
+					}
+				}
+			}
+		}
+		#end
+		for (i in 1...displayNameList.length) {
+			displayNameList[i] = i + '. ' + displayNameList[i];
+		}
+
+		noteTypeDropDown = new FlxUIDropDownMenuCustom(10, 330, FlxUIDropDownMenuCustom.makeStrIdLabelArray(displayNameList, true), function(theNoteType:String)
+		{
+			notesSetQueue = [];
+			for (i in 0..._song.notes[curSection].sectionNotes.length)
+			{
+				var noteToSet:Array<Dynamic> = _song.notes[curSection].sectionNotes[i];
+				notesSetQueue.push(noteToSet);
+			}
+			for (j in 0...notesSetQueue.length)
+			{
+				currentType = Std.parseInt(theNoteType);
+				if(notesSetQueue[j] != null && notesSetQueue[j][1] > -1) {
+				notesSetQueue[j][3] = noteTypeIntMap.get(currentType);
+				updateGrid();
+			}
+		}
+		});
+		blockPressWhileScrolling.push(noteTypeDropDown);
 
 
 		var copyButton:FlxButton = new FlxButton(10, 150, "Copy Section", function()
@@ -792,13 +846,13 @@ class ChartingState extends MusicBeatState
 		tab_group_section.add(stepperCopy);
 		tab_group_section.add(copyLastButton);
 		tab_group_section.add(insertSectionButton);
+		tab_group_section.add(noteTypeDropDown);
 
 		UI_box.addGroup(tab_group_section);
 	}
 
 	var stepperSusLength:FlxUINumericStepper;
 	var strumTimeInputText:FlxUIInputText; //I wanted to use a stepper but we can't scale these as far as i know :(
-	var noteTypeDropDown:FlxUIDropDownMenuCustom;
 	var currentType:Int = 0;
 
 	function addNoteUI():Void

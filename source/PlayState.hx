@@ -293,7 +293,8 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		#if MODS_ALLOWED
-		Paths.destroyLoadedImages();
+		Paths.clearStoredMemory();
+		Paths.clearUnusedMemory();
 		#end
 
 		// for lua
@@ -1355,8 +1356,7 @@ class PlayState extends MusicBeatState
 
 	public function reloadHealthBarColors() {
 		healthBar.createFilledBar(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
-			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
-			
+		FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
 		healthBar.updateBar();
 	}
 
@@ -1619,17 +1619,12 @@ class PlayState extends MusicBeatState
 			generateStaticArrows(0);
 			generateStaticArrows(1);
 			for (i in 0...4) {
-				trace(i);
-				trace(opponentStrums.members[i].x);
 				strumNotesX[i] = opponentStrums.members[i].x;
 				strumNotesY[i] = opponentStrums.members[i].y;
 	
 				strumNotesX[i+4] = playerStrums.members[i].x;
 				strumNotesY[i+4] = playerStrums.members[i].y;
 			}
-
-			trace(strumNotesX);
-			trace(strumNotesY);
 			startedCountdown = true;
 			Conductor.songPosition = 0;
 			Conductor.songPosition -= Conductor.crochet * 5;
@@ -2502,7 +2497,7 @@ class PlayState extends MusicBeatState
 			var time:Float = 1500;
 			if(roundedSpeed < 1) time /= roundedSpeed;
 
-			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time && notes.length < 100)
+			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time && notes.length < 75)
 			{
 				var dunceNote:Note = unspawnNotes[0];
 				notes.add(dunceNote);
@@ -2640,8 +2635,10 @@ class PlayState extends MusicBeatState
 
 				if (doKill)
 				{
-					if (daNote.mustPress && !cpuControlled &&!daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit)) {
+					trace('note killed');
+					if (daNote.mustPress && !cpuControlled && !daNote.ignoreNote && !endingSong && (daNote.tooLate || !daNote.wasGoodHit)) {
 						noteMiss(daNote);
+						trace('note missed');
 					}
 
 					daNote.active = false;
@@ -3845,7 +3842,7 @@ class PlayState extends MusicBeatState
 			notes.forEachAlive(function(daNote:Note)
 			{
 				// hold note functions
-				if ((daNote.isSustainNote || ClientPrefs.pussyInput) && controlHoldArray[daNote.noteData] && daNote.canBeHit 
+				if ((daNote.isSustainNote || ClientPrefs.holdInput) && controlHoldArray[daNote.noteData] && daNote.canBeHit 
 				&& daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit) {
 					goodNoteHit(daNote);
 				}
@@ -4360,16 +4357,6 @@ class PlayState extends MusicBeatState
 		if(luaArray != null && !preventLuaRemove) {
 			luaArray.remove(lua);
 		}
-	}
-
-	public static function activateChartingMode()
-	{
-		chartingMode = true;
-	}
-
-	public static function disableChartingMode()
-	{
-		chartingMode = false;
 	}
 
 	var lastStepHit:Int = -1;
